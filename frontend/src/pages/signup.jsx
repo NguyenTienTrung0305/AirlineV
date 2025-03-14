@@ -9,12 +9,44 @@ export default function Login() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-[url(/clouds-background.jpg)] bg-cover bg-center p-5">
             <div className="max-w-lg w-full bg-white rounded-md shadow-lg">
-                <h1 className="text-orange text-4xl font-bold text-center pt-4 pb-2">Chào mừng trở lại</h1>
-                <p className="text-gray  text-md text-center">Nhập thông tin đăng nhập để truy cập tài khoản của bạn</p>
+                <h1 className="text-orange text-4xl font-bold text-center pt-4 pb-2">Tạo tài khoản</h1>
+                <p className="text-gray  text-md text-center">Nhập thông tin của bạn để đăng ký tài khoản mới</p>
 
                 <div>
                     <form className="space-y-4 px-6 py-6">
                         <div className="space-y-2">
+                            <div className="flex justify-between pb-4 w-full">
+                                <div className="space-y-2 w-[45%]">
+                                    <label htmlFor="firstname" className="text-sm font-medium text-gray-700">
+                                        Họ
+                                    </label>
+                                    <Input
+                                        id="firstname"
+                                        name="firstname"
+                                        type="text"
+                                        placeholder="Nguyễn"
+                                        required
+                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
+
+                                    />
+                                </div>
+
+                                <div className="space-y-2 w-[45%]">
+                                    <label htmlFor="lastname" className="text-sm font-medium text-gray-700">
+                                        Tên
+                                    </label>
+                                    <Input
+                                        id="lastname"
+                                        name="lastname"
+                                        type="text"
+                                        placeholder="John"
+                                        required
+                                        className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
+
+                                    />
+                                </div>
+
+                            </div>
                             <label htmlFor="email" className="text-sm font-medium text-gray-700">
                                 Email
                             </label>
@@ -42,12 +74,25 @@ export default function Login() {
                             />
                         </div>
 
+                        <div className="space-y-2">
+                            <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                                Repeat Password
+                            </label>
+                            <Input
+                                id="password"
+                                name="password"
+                                type={"password"}
+                                required
+                                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
+                            />
+                        </div>
+
                         <Button
                             type="submit"
                             variant="default"
                             className="w-full text-white p-2 text-xl bg-orange"
                         >
-                            Đăng nhập
+                            Đăng ký
                         </Button>
                     </form>
 
@@ -75,14 +120,11 @@ export default function Login() {
                     </div>
 
                     <div className="flex flex-col items-center justify-center py-6 gap-4">
-                        <Button variant="link" className="text-[#e8604c] hover:text-[#d55643] text-md">
-                            Quên mật khẩu?
-                        </Button>
                         <p className="text-md text-center text-gray-600">
-                            Bạn chưa có tài khoản?{" "}
-                            <Link href="/signup">
+                            Bạn đã có tài khoản?
+                            <Link href="/login">
                                 <Button variant="link" className="p-0 text-[#e8604c] hover:text-[#d55643] text-md">
-                                    Đăng ký
+                                    Đăng Nhập
                                 </Button>
                             </Link>
                         </p>
