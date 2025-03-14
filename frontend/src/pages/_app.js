@@ -15,3 +15,10 @@ function MyApp({ Component, pageProps }) {
 }
 
 export default MyApp;
+
+
+// mặc định của pages/_app.js => router sẽ là router /
+// => pages/login.jsx => router sẽ alf router /login
+// => pages/auth/login.jsx => router sẽ là /auth/login
+// => pages/news/index.jsx => router là /news
+// => pages/news/article.jsx => router là /news/article

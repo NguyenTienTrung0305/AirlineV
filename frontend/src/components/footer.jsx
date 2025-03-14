@@ -15,7 +15,7 @@ export default function Footer() {
         {/* Phần thông tin liên hệ */}
         <div className="lg:w-1/3 w-full">
           <Image
-            src="/logo.jpg"
+            src="/logo-1.png"
             alt="Logo"
             width={130}
             height={130}

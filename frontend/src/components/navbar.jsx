@@ -34,7 +34,7 @@ export default function NavBar() {
                     <div className="flex items-center ml-4">
                         <Link href="/">
                             <Image
-                                src="/logo.jpg"
+                                src="/logo-1.png"
                                 alt="Logo"
                                 className="w-36"
                                 width={144}

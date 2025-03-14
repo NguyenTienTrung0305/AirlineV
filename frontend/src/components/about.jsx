@@ -14,10 +14,10 @@ import { Button } from "./ui/button";
 export default function About() {
     return (
         <>
-            <div className="bg-[url(/bg-1.jpg)] w-full bg-center bg-no-repeat py-24 bg-cover">
+            <div className="bg-[url(/bg-1.jpg)] w-full bg-center bg-no-repeat bg-cover">
                 <div className="flex flex-col lg:flex-row gap-12 px-6 mx-auto max-w-[1400px]">
                     {/* introduce */}
-                    <div className="lg:w-1/2 w-full lg:mt-12 mt-24">
+                    <div className="lg:w-1/2 w-full lg:mt-12 mt-16 lg:text-left text-center">
                         <span data-aos="fade-up-right">
                             <Button variant="destructive" className="animate-bounce p-8 bg-orange">
                                 <FaPlay className="text-white" />
@@ -30,7 +30,7 @@ export default function About() {
                             className="lg:text-[50px] leading-normal text-3xl font-bold text-white lg:pb-0 pb-4"
                             data-aos="fade-up-right"
                         >
-                            QAirline là nền tảng đặt vé máy bay hàng đầu thế giới
+                            AirlineV là nền tảng đặt vé máy bay hàng đầu thế giới
                         </p>
                     </div>
 

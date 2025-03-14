@@ -6,6 +6,7 @@ import Hero from '@/components/hero';
 import Destination from '@/components/destination';
 import About from '@/components/about';
 import Review from '@/components/review';
+import Benefit from '@/components/benefit';
 
 function Home() {
     useEffect(() => {
@@ -15,10 +16,11 @@ function Home() {
     }, []);
     return (
         <div>
-            <Hero/>
-            <Destination/>
-            <About/>
-            <Review/>    
+            <Hero />
+            <Destination />
+            <About />
+            <Review />
+            <Benefit />
         </div>
 
     );
