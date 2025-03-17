@@ -116,7 +116,7 @@ function createToastSystem(config = defaultConfig) {
             // callback
             listeners.push(setState);
 
-            // cleanup (component unmount)
+            // cleanup (useToast unmount)
             return () => {
                 const index = listeners.indexOf(setState);
                 if (index > -1) listeners.splice(index, 1);
