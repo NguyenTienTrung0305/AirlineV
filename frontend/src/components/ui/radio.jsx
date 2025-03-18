@@ -7,7 +7,7 @@ const RadioGroup = RadioGroupPrimitive.Root
 const RadioGroupItem = React.forwardRef(({ className, ...props }, ref) => (
     <RadioGroupPrimitive.Item
         ref={ref}
-        className={cn("aspect-square flex justify-center w-4 h-4 rounded-full border border-primary ", className)}
+        className={cn("aspect-square flex justify-center w-4 h-4 rounded-full border-2 border-primary ", className)}
         {...props}
     >
         <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
