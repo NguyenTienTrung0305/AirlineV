@@ -4,11 +4,10 @@ import { Slider } from '@/components/ui/slider'
 import { RadioGroup } from "../ui/radio";
 import { RadioGroupItem } from "../ui/radio";
 import { Button } from "../ui/button";
-import { id } from "date-fns/locale";
 
 export function FlightFilter() {
     const [budget, setBudget] = useState([100000, 4000000])
-    const [departureTime, setDepartureTime] = useState("12h")
+    const [departureTime, setDepartureTime] = useState("all")
     const handleResetFilters = () => {
         const defaultBudget = [1000000,4000000]
         const defaultDepartureTime = "all"
@@ -76,10 +75,10 @@ export function FlightFilter() {
 
 
                 <div className="flex justify-between mt-4">
-                    <Button variant="outline" onClick={handleResetFilters} className="p-2">
+                    <Button variant="outline" onClick={handleResetFilters} className="p-3 w-[20%] lg:w-auto">
                         Thiết lập lại
                     </Button>
-                    <Button className="bg-orange text-white p-2" onClick={handleApplyFilters}>
+                    <Button variant="default" className="bg-orange text-white p-3 w-[20%] lg:w-auto" onClick={handleApplyFilters}>
                         Áp dụng
                     </Button>
                 </div>
