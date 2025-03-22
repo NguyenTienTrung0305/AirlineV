@@ -53,7 +53,7 @@ export function FlightCard({ flights }) {
                                         <span>• Thời gian bay dự kiến: {flight.duration}</span>
                                         <span className="md:mx-auto mx-0 ">• Số hiệu: {flight.flightNumber}</span>
                                     </div>
-                                    
+
                                 </div>
 
                                 {/* Button phổ thông, thương gia */}
