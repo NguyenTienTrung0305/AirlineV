@@ -9,6 +9,7 @@
         "airline": "Vietnam Airlines",
         "economyPrice": 3582000,
         "businessPrice": 5860000,
+        "numberSeatLeft": "3",
         "seatsLeft": [
             3,
             5,
@@ -23,7 +24,7 @@
             {
                 "id": "eco1",
                 "name": "Phổ Thông Tiêu Chuẩn",
-                "price": 2955000,
+                "price": 2355000,
                 "changeFee": 860000,
                 "refundFee": 860000,
                 "checkedBaggage": "1 x 23 kg",
@@ -32,9 +33,9 @@
             {
                 "id": "eco2",
                 "name": "Phổ Thông Linh Hoạt",
-                "price": 3582000,
-                "changeFee": 360000,
-                "refundFee": 360000,
+                "price": 2932000,
+                "changeFee": 720000,
+                "refundFee": 720000,
                 "checkedBaggage": "1 x 23 kg",
                 "carryOn": "Không quá 12kg"
             }
@@ -44,18 +45,18 @@
                 "id": "bus1",
                 "name": "Thương Gia Tiêu Chuẩn",
                 "price": 2955000,
-                "changeFee": 860000,
-                "refundFee": 860000,
-                "checkedBaggage": "1 x 23 kg",
+                "changeFee": 360000,
+                "refundFee": 360000,
+                "checkedBaggage": "1 x 35 kg",
                 "carryOn": "Không quá 12kg"
             },
             {
                 "id": "bus2",
                 "name": "Thương Gia Linh Hoạt",
                 "price": 3582000,
-                "changeFee": 360000,
-                "refundFee": 360000,
-                "checkedBaggage": "1 x 23 kg",
+                "changeFee": 180000,
+                "refundFee": 180000,
+                "checkedBaggage": "1 x 35 kg",
                 "carryOn": "Không quá 12kg"
             }
         ]
@@ -70,6 +71,7 @@
         "airline": "Pacific Airlines",
         "economyPrice": 2340000,
         "businessPrice": 5860000,
+        "numberSeatLeft": "8",
         "seatsLeft": [
             1,
             9,
@@ -99,8 +101,8 @@
                 "id": "eco2",
                 "name": "Phổ Thông Linh Hoạt",
                 "price": 2955000,
-                "changeFee": 360000,
-                "refundFee": 360000,
+                "changeFee": 720000,
+                "refundFee": 720000,
                 "checkedBaggage": "1 x 23 kg",
                 "carryOn": "Không quá 12kg"
             }
@@ -110,18 +112,18 @@
                 "id": "bus1",
                 "name": "Thương Gia Tiêu Chuẩn",
                 "price": 2955000,
-                "changeFee": 860000,
-                "refundFee": 860000,
-                "checkedBaggage": "1 x 23 kg",
+                "changeFee": 360000,
+                "refundFee": 360000,
+                "checkedBaggage": "1 x 35 kg",
                 "carryOn": "Không quá 12kg"
             },
             {
                 "id": "bus2",
                 "name": "Thương Gia Linh Hoạt",
                 "price": 3582000,
-                "changeFee": 360000,
-                "refundFee": 360000,
-                "checkedBaggage": "1 x 23 kg",
+                "changeFee": 180000,
+                "refundFee": 180000,
+                "checkedBaggage": "1 x 35 kg",
                 "carryOn": "Không quá 12kg"
             }
         ]
