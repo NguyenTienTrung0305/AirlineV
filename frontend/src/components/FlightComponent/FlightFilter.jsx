@@ -5,11 +5,11 @@ import { RadioGroup } from "../ui/radio";
 import { RadioGroupItem } from "../ui/radio";
 import { Button } from "../ui/button";
 
-export function FlightFilter() {
+export function FlightFilter({ ...props }) {
     const [budget, setBudget] = useState([100000, 4000000])
     const [departureTime, setDepartureTime] = useState("all")
     const handleResetFilters = () => {
-        const defaultBudget = [1000000,4000000]
+        const defaultBudget = [1000000, 4000000]
         const defaultDepartureTime = "all"
         setBudget(defaultBudget)
         setDepartureTime(defaultDepartureTime)
@@ -20,6 +20,7 @@ export function FlightFilter() {
     }
 
     return (
+        <div{...props}>
         <Card className="w-full lg:w-72 h-fit rounded-md border-2 border-border shadow-lg">
             <CardContent className="p-4">
                 <div className="flex justify-between items-center mb-4">
@@ -84,5 +85,6 @@ export function FlightFilter() {
                 </div>
             </CardContent>
         </Card>
+        </div>
     )
 }

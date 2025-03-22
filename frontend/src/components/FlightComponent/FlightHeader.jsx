@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { User } from "lucide-react";
 
-export function FlightHeader({ departureCode, arrivalCode, departureCity, arrivalCity, departureDate, returnDate, passengers }) {
+export function FlightHeader({ departureCode, arrivalCode, departureCity, arrivalCity, departureDate, returnDate, passengers, ...props }) {
     return (
-        <>
+        <div {...props}>
             <div className="relative h-[300px] w-full">
                 <Image
                     src="/tours_background.jpg"
@@ -64,6 +64,6 @@ export function FlightHeader({ departureCode, arrivalCode, departureCity, arriva
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     )
 }
