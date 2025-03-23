@@ -10,15 +10,46 @@ export function FlightCard({ flights }) {
     const [selectedOptionId, setSelectedOptionId] = useState(null);
 
     const handleExpanded = (flightIndex, classType) => {
+        setSelectedOptionId(null);
         if (expandedFlight === flightIndex && expandedClass === classType) {
             setExpandedFlight(null);
             setExpandedClass(null);
-            setSelectedOptionId(null);
         } else {
             setExpandedFlight(flightIndex);
             setExpandedClass(classType);
         }
     };
+
+    const seatCol = [
+        {
+            'col': 'A',
+            'row': 14
+        },
+        {
+            'col': 'B',
+            'row': 13
+        },
+        {
+            'col': 'C',
+            'row': 14
+        },
+        {
+            'col': '',
+            'row': 14
+        },
+        {
+            'col': 'D',
+            'row': 14
+        },
+        {
+            'col': 'E',
+            'row': 13
+        },
+        {
+            'col': 'F',
+            'row': 14
+        },
+    ]
 
     return (
         <div className="flex-1 space-y-4">
@@ -205,36 +236,67 @@ export function FlightCard({ flights }) {
 
                             {/* xử lý sự kiện chọn vé */}
                             {selectedOptionId && expandedFlight === index && (
-                                <div className="grid md:grid-cols-2 border-2 border-border p-6 mt-4">
+                                <div className="grid md:grid-cols-2 border-2 border-border p-6 mt-4 rounded-lg">
                                     {/* instructions */}
-                                    <div className="relative flex flex-col justify-center items-center border-r border-black">
+                                    <div className="relative flex flex-col justify-center items-center">
                                         <BsFillAirplaneEnginesFill className="text-teal-700 h-[120px] w-[120px] scale-y-110" />
-                                        <div className="grid grid-cols-2 items-start gap-2 my-6 p-3 border w-full">
+                                        <div className="grid grid-cols-2 items-start gap-2 my-6 p-3 w-full">
                                             {/* seat */}
-                                            <div className="text-left">
-                                                <div className="flex gap-2 items-center">
+                                            <div className="text-left border-r border-teal-500 grid gap-2">
+                                                <div className="flex gap-2 items-center" id="business">
                                                     <Sofa className="w-7 h-7 text-orange" />
                                                     <p>Business Seats</p>
                                                 </div>
-                                                <div className="flex gap-2 items-center">
+                                                <div className="flex gap-2 items-center" id="window">
                                                     <Sofa className="w-7 h-7 text-blue-300" />
                                                     <p>Near Window Seats</p>
                                                 </div>
-                                                <div className="flex gap-2 items-center">
+                                                <div className="flex gap-2 items-center" id="normal">
                                                     <Sofa className="w-7 h-7 " />
                                                     <p>Normal Seats</p>
                                                 </div>
-                                                <div className="flex gap-2 items-center">
+                                                <div className="flex gap-2 items-center" id="unselected">
                                                     <Sofa className="w-7 h-7 text-teal-700" />
                                                     <p>Unselected Seats</p>
                                                 </div>
                                             </div>
 
                                             {/* explane seat  */}
-                                            <div>
-                                                <h1>abc</h1>
+                                            <div className="grid gap-2 text-lg -mt-0.5 mx-auto">
+                                                <h1 htmlFor="bisiness">Have all services</h1>
+                                                <h1 htmlFor="window">Best view</h1>
+                                                <h1 htmlFor="normal">Good service</h1>
+                                                <h1 htmlFor="unselected">Oops</h1>
                                             </div>
                                         </div>
+                                    </div>
+
+                                    {/* choose seats */}
+                                    <div className="relative grid grid-cols-7 p-2 border-2 shadow-lg rounded-lg">
+                                        {seatCol.map((seat, index) => (
+                                            <div key={index} className="flex flex-col items-center">
+                                                <div className="absolute lg:w-2 w-1 bg-orange -left-2 rounded-l-[10px] top-[220px] bottom-[20px]"></div>
+                                                <div className="absolute lg:w-2 w-1 bg-orange -right-2 rounded-r-[10px] top-[220px] bottom-[20px]"></div>
+                                                <h1 className="min-h-[2rem]">{seat.col}</h1>
+                                                <div className="flex flex-col items-center">
+                                                    {[...Array(seat.row)].map((_, index_) => {
+                                                        if (seat.row === 13 && index_ === 0) {
+                                                            return (
+                                                                <div>
+                                                                    <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>
+                                                                    <Sofa key={index_} className="w-7 h-7 text-teal-700 min-h-[1.8rem]" />
+                                                                </div>
+                                                            )
+                                                        }
+                                                        return (
+                                                            seat.col !== ''
+                                                                ? <Sofa key={index_} className="w-7 h-7 text-teal-700 min-h-[1.8rem]" />
+                                                                : <h1 className="h-7 min-h-[1.8rem] pt-[2px]">{index_ + 1}</h1>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             )}
