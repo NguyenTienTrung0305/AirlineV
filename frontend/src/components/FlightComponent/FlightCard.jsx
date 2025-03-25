@@ -9,6 +9,8 @@ export function FlightCard({ flights }) {
     const [expandedClass, setExpandedClass] = useState(null);
     const [selectedOptionId, setSelectedOptionId] = useState(null);
 
+    const [selectedSeats, setSelectedSeats] = useState([]);
+
     const handleExpanded = (flightIndex, classType) => {
         setSelectedOptionId(null);
         if (expandedFlight === flightIndex && expandedClass === classType) {
@@ -20,34 +22,75 @@ export function FlightCard({ flights }) {
         }
     };
 
+    const handleSeatClick = (col, row) => {
+        const seatIdentifier = `${col}-${row}`;
+        setSelectedSeats((prev) => {
+            if (prev.includes(seatIdentifier)) {
+                // Nếu ghế đã được chọn, bỏ chọn
+                return prev.filter((seat) => seat !== seatIdentifier);
+            } else {
+                // Nếu ghế chưa được chọn, thêm vào danh sách
+                return [...prev, seatIdentifier];
+            }
+        });
+    };
+
     const seatCol = [
         {
             'col': 'A',
-            'row': 14
+            'rowBusiness': 4,
+            'rowNormal': 10,
+            'missBusiness': 0,
+            'missNormal': 0,
+            'soldoutSeat': [2, 3, 5, 7, 9]
         },
         {
             'col': 'B',
-            'row': 13
+            'rowBusiness': 4,
+            'rowNormal': 10,
+            'missBusiness': 1,
+            'missNormal': 0,
+            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
         },
         {
             'col': 'C',
-            'row': 14
+            'rowBusiness': 4,
+            'rowNormal': 10,
+            'missBusiness': 0,
+            'missNormal': 0,
+            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
         },
         {
             'col': '',
-            'row': 14
+            'rowBusiness': 4,
+            'rowNormal': 10,
+            'missBusiness': 0,
+            'missNormal': 0,
+            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
         },
         {
             'col': 'D',
-            'row': 14
+            'rowBusiness': 4,
+            'rowNormal': 10,
+            'missBusiness': 0,
+            'missNormal': 0,
+            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
         },
         {
             'col': 'E',
-            'row': 13
+            'rowBusiness': 4,
+            'rowNormal': 10,
+            'missBusiness': 1,
+            'missNormal': 0,
+            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
         },
         {
             'col': 'F',
-            'row': 14
+            'rowBusiness': 4,
+            'rowNormal': 10,
+            'missBusiness': 0,
+            'missNormal': 2,
+            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
         },
     ]
 
@@ -239,7 +282,8 @@ export function FlightCard({ flights }) {
                                 <div className="grid md:grid-cols-2 border-2 border-border p-6 mt-4 rounded-lg">
                                     {/* instructions */}
                                     <div className="relative flex flex-col justify-center items-center">
-                                        <BsFillAirplaneEnginesFill className="text-teal-700 h-[120px] w-[120px] scale-y-110" />
+                                        <div className="absolute left-0 top-0 font-bold ">Chọn ghế ngồi</div>
+                                        <BsFillAirplaneEnginesFill className="text-teal-700 h-[120px] w-[120px] scale-y-110 md:mt-0 mt-16" />
                                         <div className="grid grid-cols-2 items-start gap-2 my-6 p-3 w-full">
                                             {/* seat */}
                                             <div className="text-left border-r border-teal-500 grid gap-2">
@@ -248,51 +292,110 @@ export function FlightCard({ flights }) {
                                                     <p>Business Seats</p>
                                                 </div>
                                                 <div className="flex gap-2 items-center" id="window">
-                                                    <Sofa className="w-7 h-7 text-blue-300" />
+                                                    <Sofa className="w-7 h-7 text-blue-700" />
                                                     <p>Near Window Seats</p>
                                                 </div>
                                                 <div className="flex gap-2 items-center" id="normal">
-                                                    <Sofa className="w-7 h-7 " />
+                                                    <Sofa className="w-7 h-7 text-[#35AB58]" />
                                                     <p>Normal Seats</p>
                                                 </div>
                                                 <div className="flex gap-2 items-center" id="unselected">
                                                     <Sofa className="w-7 h-7 text-teal-700" />
                                                     <p>Unselected Seats</p>
                                                 </div>
+                                                <div className="flex gap-2 items-center" id="soldout">
+                                                    <Sofa className="w-7 h-7 text-black" />
+                                                    <p>Soldout Seats</p>
+                                                </div>
                                             </div>
 
                                             {/* explane seat  */}
                                             <div className="grid gap-2 text-lg -mt-0.5 mx-auto">
-                                                <h1 htmlFor="bisiness">Have all services</h1>
-                                                <h1 htmlFor="window">Best view</h1>
-                                                <h1 htmlFor="normal">Good service</h1>
-                                                <h1 htmlFor="unselected">Oops</h1>
+                                                <h1 htmlFor="bisiness">1A to 4F</h1>
+                                                <h1 htmlFor="window">7A to 14A and 7F to 14F</h1>
+                                                <h1 htmlFor="normal">Remains Seats</h1>
+                                                <h1 htmlFor="unselected">Unselected Seats</h1>
+                                                <h1 htmlFor="soldout">Soldout Seats</h1>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* choose seats */}
-                                    <div className="relative grid grid-cols-7 p-2 border-2 shadow-lg rounded-lg">
+                                    <div className={`relative grid grid-cols-${Math.max(1, seatCol.length)} p-2 border-2 shadow-lg rounded-lg`}>
                                         {seatCol.map((seat, index) => (
                                             <div key={index} className="flex flex-col items-center">
-                                                <div className="absolute lg:w-2 w-1 bg-orange -left-2 rounded-l-[10px] top-[220px] bottom-[20px]"></div>
-                                                <div className="absolute lg:w-2 w-1 bg-orange -right-2 rounded-r-[10px] top-[220px] bottom-[20px]"></div>
+                                                <div className="absolute lg:w-2 w-1 bg-orange -left-2 rounded-l-[10px] top-[230px] bottom-[10px]"></div>
+                                                <div className="absolute lg:w-2 w-1 bg-orange -right-2 rounded-r-[10px] top-[230px] bottom-[10px]"></div>
                                                 <h1 className="min-h-[2rem]">{seat.col}</h1>
                                                 <div className="flex flex-col items-center">
-                                                    {[...Array(seat.row)].map((_, index_) => {
-                                                        if (seat.row === 13 && index_ === 0) {
-                                                            return (
-                                                                <div>
-                                                                    <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>
-                                                                    <Sofa key={index_} className="w-7 h-7 text-teal-700 min-h-[1.8rem]" />
-                                                                </div>
-                                                            )
+                                                    {/* sold out seats */}
+
+
+                                                    {/* business row */}
+                                                    {[...Array(seat.rowBusiness)].map((_, index_) => {
+                                                        const rowNumber = index_ + 1
+                                                        // miss seats
+                                                        if (seat.missBusiness > 0) {
+                                                            seat.missBusiness -= 1
+                                                            return <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>;
                                                         }
-                                                        return (
-                                                            seat.col !== ''
-                                                                ? <Sofa key={index_} className="w-7 h-7 text-teal-700 min-h-[1.8rem]" />
-                                                                : <h1 className="h-7 min-h-[1.8rem] pt-[2px]">{index_ + 1}</h1>
-                                                        )
+
+                                                        return seat.col !== '' ? (
+                                                            seat.soldoutSeat && seat.soldoutSeat.includes(rowNumber) ? (
+                                                                <Sofa
+                                                                    key={index_}
+                                                                    className="w-7 h-7 min-h-[1.8rem] text-black cursor-not-allowed"
+                                                                />
+                                                            ) : (
+                                                                <Sofa
+                                                                    key={index_}
+                                                                    className={`w-7 h-7 min-h-[1.8rem] cursor-pointer hover:scale-125 ${selectedSeats.includes(`${seat.col}-${rowNumber}`)
+                                                                        ? 'text-orange'
+                                                                        : 'text-teal-700'
+                                                                        }`}
+                                                                    onClick={() => handleSeatClick(seat.col, rowNumber)}
+                                                                />
+                                                            )
+                                                        ) : (
+                                                            <h1 key={index_} className="h-7 min-h-[1.8rem] pt-[2px]">
+                                                                {index_ + 1}
+                                                            </h1>
+                                                        );
+                                                    })}
+
+                                                    {/* Spacer between business row and normal row */}
+                                                    <div className="w-7 h-4 min-h-[1rem]"></div>
+
+                                                    {/* normal row */}
+                                                    {[...Array(seat.rowNormal)].map((_, index_) => {
+                                                        const adjustedIndex = index_ + 4;
+                                                        const rowNumber = adjustedIndex + 1
+                                                        if (seat.missNormal > 0) {
+                                                            seat.missNormal -= 1
+                                                            return <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>;
+                                                        }
+                                                        return seat.col !== '' ? (
+                                                            seat.soldoutSeat && seat.soldoutSeat.includes(rowNumber) ? (
+                                                                <Sofa
+                                                                    key={index_}
+                                                                    className="w-7 h-7 min-h-[1.8rem] text-[#000000] cursor-not-allowed"
+                                                                />
+                                                            ) : (
+                                                                <Sofa key={adjustedIndex}
+                                                                    className={`w-7 h-7 min-h-[1.8rem] cursor-pointer hover:scale-125
+                                                                    ${(selectedSeats.includes(`${seat.col}-${rowNumber}`) && (seat.col === 'A' || seat.col === 'F') && rowNumber >= 7)
+                                                                            ? 'text-blue-700'
+                                                                            : selectedSeats.includes(`${seat.col}-${rowNumber}`) ? 'text-[#35AB58]' : 'text-teal-700'}
+                                                                    `}
+                                                                    onClick={() => handleSeatClick(seat.col, rowNumber)
+                                                                    }
+                                                                />
+                                                            )
+                                                        ) : (
+                                                            <h1 key={adjustedIndex} className="h-7 min-h-[1.8rem] pt-[2px]">
+                                                                {adjustedIndex + 1}
+                                                            </h1>
+                                                        );
                                                     })}
                                                 </div>
                                             </div>
