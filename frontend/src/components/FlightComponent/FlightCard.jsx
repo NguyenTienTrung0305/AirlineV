@@ -35,65 +35,6 @@ export function FlightCard({ flights }) {
         });
     };
 
-    const seatCol = [
-        {
-            'col': 'A',
-            'rowBusiness': 4,
-            'rowNormal': 10,
-            'missBusiness': 0,
-            'missNormal': 0,
-            'soldoutSeat': [2, 3, 5, 7, 9]
-        },
-        {
-            'col': 'B',
-            'rowBusiness': 4,
-            'rowNormal': 10,
-            'missBusiness': 1,
-            'missNormal': 0,
-            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
-        },
-        {
-            'col': 'C',
-            'rowBusiness': 4,
-            'rowNormal': 10,
-            'missBusiness': 0,
-            'missNormal': 0,
-            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
-        },
-        {
-            'col': '',
-            'rowBusiness': 4,
-            'rowNormal': 10,
-            'missBusiness': 0,
-            'missNormal': 0,
-            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
-        },
-        {
-            'col': 'D',
-            'rowBusiness': 4,
-            'rowNormal': 10,
-            'missBusiness': 0,
-            'missNormal': 0,
-            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
-        },
-        {
-            'col': 'E',
-            'rowBusiness': 4,
-            'rowNormal': 10,
-            'missBusiness': 1,
-            'missNormal': 0,
-            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
-        },
-        {
-            'col': 'F',
-            'rowBusiness': 4,
-            'rowNormal': 10,
-            'missBusiness': 0,
-            'missNormal': 2,
-            'soldoutSeat': [1, 2, 5, 8, 9, 11, 12]
-        },
-    ]
-
     return (
         <div className="flex-1 space-y-4">
             {flights.map((flight, index) => (
@@ -279,11 +220,15 @@ export function FlightCard({ flights }) {
 
                             {/* xử lý sự kiện chọn vé */}
                             {selectedOptionId && expandedFlight === index && (
-                                <div className="grid md:grid-cols-2 border-2 border-border p-6 mt-4 rounded-lg">
+                                <div className="grid md:grid-cols-2 border-2 border-border p-6 mt-4 rounded-lg md:gap-2 gap-8 items-start">
                                     {/* instructions */}
-                                    <div className="relative flex flex-col justify-center items-center">
-                                        <div className="absolute left-0 top-0 font-bold ">Chọn ghế ngồi</div>
-                                        <BsFillAirplaneEnginesFill className="text-teal-700 h-[120px] w-[120px] scale-y-110 md:mt-0 mt-16" />
+                                    <div className="relative flex flex-col justify-center ">
+                                        <div className="text-left font-semibold text-xl tracking-tighter shadow-xl w-full">Chọn ghế ngồi</div>
+
+                                        <div className="flex items-center justify-center md:mt-7 mt-16">
+                                            <BsFillAirplaneEnginesFill className="text-teal-700 h-[120px] w-[120px] scale-y-110 " />
+                                        </div>
+
                                         <div className="grid grid-cols-2 items-start gap-2 my-6 p-3 w-full">
                                             {/* seat */}
                                             <div className="text-left border-r border-teal-500 grid gap-2">
@@ -318,30 +263,55 @@ export function FlightCard({ flights }) {
                                                 <h1 htmlFor="soldout">Soldout Seats</h1>
                                             </div>
                                         </div>
+
+
+                                        {/* Thanh toán */}
+                                        <div className="flex flex-col gap-y-4 max-h-[200px] overflow-y-auto">
+                                            <div className="sticky top-0 z-10 text-left w-full font-semibold text-xl tracking-tighter shadow-xl bg-white">Các vé đã chọn</div>
+                                            {(selectedSeats && selectedSeats.length > 0)
+                                                ? (
+                                                    <div className="space-y-3">
+                                                        {selectedSeats.map((ele, index) => (
+                                                            <div key={index} className="w-[90%] rounded-md bg-slate-100 p-2">{ele}</div>
+                                                        ))}
+                                                        <p className="w-[90%] p-2 border-t border-teal-500">Total</p>
+                                                        <Button className="p-2 bg-blue-500 w-[90%] text-white hover:bg-blue-800 transition-all duration-300">Continue to Payment</Button>
+                                                    </div>
+                                                )
+                                                : (
+                                                    <div className="space-y-2">
+                                                        <div className="text-teal-500 transition-all duration-300">Chưa ghế nào được chọn</div>
+                                                        <Button className="p-2 bg-teal-300 cursor-not-allowed w-[90%] text-white">Continue to Payment</Button>
+                                                    </div>
+                                                )
+                                            }
+                                        </div>
+
                                     </div>
 
                                     {/* choose seats */}
-                                    <div className={`relative grid grid-cols-${Math.max(1, seatCol.length)} p-2 border-2 shadow-lg rounded-lg`}>
-                                        {seatCol.map((seat, index) => (
+                                    <div className={`relative grid grid-cols-${Math.max(1, flight.seatCol.length)} p-2 border-2 shadow-lg rounded-lg `}>
+                                        {flight.seatCol.map((seat, index) => {
+                                            let businessMissed = 0;
+                                            let normalMissed = 0;
+                                            return (
                                             <div key={index} className="flex flex-col items-center">
                                                 <div className="absolute lg:w-2 w-1 bg-orange -left-2 rounded-l-[10px] top-[230px] bottom-[10px]"></div>
                                                 <div className="absolute lg:w-2 w-1 bg-orange -right-2 rounded-r-[10px] top-[230px] bottom-[10px]"></div>
                                                 <h1 className="min-h-[2rem]">{seat.col}</h1>
                                                 <div className="flex flex-col items-center">
-                                                    {/* sold out seats */}
-
 
                                                     {/* business row */}
                                                     {[...Array(seat.rowBusiness)].map((_, index_) => {
                                                         const rowNumber = index_ + 1
                                                         // miss seats
-                                                        if (seat.missBusiness > 0) {
-                                                            seat.missBusiness -= 1
+                                                            if (businessMissed < seat.missBusiness) {
+                                                                businessMissed += 1;
                                                             return <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>;
                                                         }
 
                                                         return seat.col !== '' ? (
-                                                            seat.soldoutSeat && seat.soldoutSeat.includes(rowNumber) ? (
+                                                                seat.soldoutSeat && seat.soldoutSeat.includes(rowNumber) ? ( // soldout seats
                                                                 <Sofa
                                                                     key={index_}
                                                                     className="w-7 h-7 min-h-[1.8rem] text-black cursor-not-allowed"
@@ -349,11 +319,21 @@ export function FlightCard({ flights }) {
                                                             ) : (
                                                                 <Sofa
                                                                     key={index_}
-                                                                    className={`w-7 h-7 min-h-[1.8rem] cursor-pointer hover:scale-125 ${selectedSeats.includes(`${seat.col}-${rowNumber}`)
+                                                                        className={`w-7 h-7 min-h-[1.8rem]
+                                                                            ${selectedSeats.includes(`${seat.col}-${rowNumber}`)
                                                                         ? 'text-orange'
                                                                         : 'text-teal-700'
-                                                                        }`}
-                                                                    onClick={() => handleSeatClick(seat.col, rowNumber)}
+                                                                            }
+                                                                            ${expandedClass === 'economy'
+                                                                                ? 'cursor-not-allowed'
+                                                                                : 'cursor-pointer hover:scale-125 '
+                                                                            }
+                                                                        `}
+                                                                        onClick={
+                                                                            expandedClass === 'economy'
+                                                                                ? undefined // Không cho phép click
+                                                                                : () => handleSeatClick(seat.col, rowNumber)
+                                                                        }
                                                                 />
                                                             )
                                                         ) : (
@@ -370,8 +350,8 @@ export function FlightCard({ flights }) {
                                                     {[...Array(seat.rowNormal)].map((_, index_) => {
                                                         const adjustedIndex = index_ + 4;
                                                         const rowNumber = adjustedIndex + 1
-                                                        if (seat.missNormal > 0) {
-                                                            seat.missNormal -= 1
+                                                            if (normalMissed < seat.missNormal) {
+                                                                normalMissed += 1
                                                             return <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>;
                                                         }
                                                         return seat.col !== '' ? (
@@ -381,13 +361,23 @@ export function FlightCard({ flights }) {
                                                                     className="w-7 h-7 min-h-[1.8rem] text-[#000000] cursor-not-allowed"
                                                                 />
                                                             ) : (
-                                                                <Sofa key={adjustedIndex}
-                                                                    className={`w-7 h-7 min-h-[1.8rem] cursor-pointer hover:scale-125
-                                                                    ${(selectedSeats.includes(`${seat.col}-${rowNumber}`) && (seat.col === 'A' || seat.col === 'F') && rowNumber >= 7)
+                                                                    <Sofa
+                                                                        key={adjustedIndex}
+                                                                        className={`w-7 h-7 min-h-[1.8rem] ${expandedClass === 'business'
+                                                                                ? 'cursor-not-allowed'
+                                                                                : 'cursor-pointer hover:scale-125'
+                                                                            } ${selectedSeats.includes(`${seat.col}-${rowNumber}`) &&
+                                                                                (seat.col === 'A' || seat.col === 'F') &&
+                                                                                rowNumber >= 7
                                                                             ? 'text-blue-700'
-                                                                            : selectedSeats.includes(`${seat.col}-${rowNumber}`) ? 'text-[#35AB58]' : 'text-teal-700'}
-                                                                    `}
-                                                                    onClick={() => handleSeatClick(seat.col, rowNumber)
+                                                                                : selectedSeats.includes(`${seat.col}-${rowNumber}`)
+                                                                                    ? 'text-[#35AB58]'
+                                                                                    : 'text-teal-700'
+                                                                            }`}
+                                                                        onClick={
+                                                                            expandedClass === 'business'
+                                                                                ? undefined // Không cho phép click
+                                                                                : () => handleSeatClick(seat.col, rowNumber)
                                                                     }
                                                                 />
                                                             )
@@ -399,7 +389,8 @@ export function FlightCard({ flights }) {
                                                     })}
                                                 </div>
                                             </div>
-                                        ))}
+                                            )
+                                        })}
                                     </div>
                                 </div>
                             )}
