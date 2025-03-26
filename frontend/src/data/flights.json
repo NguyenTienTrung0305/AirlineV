@@ -10,11 +10,6 @@
         "economyPrice": 3582000,
         "businessPrice": 5860000,
         "numberSeatLeft": "3",
-        "seatsLeft": [
-            3,
-            5,
-            9
-        ],
         "flightNumber": "VN 267",
         "departureAirport": "Sân bay Nội Bài, Việt Nam",
         "arrivalAirport": "Sân bay Tân Sơn Nhất, Việt Nam",
@@ -59,6 +54,64 @@
                 "checkedBaggage": "1 x 35 kg",
                 "carryOn": "Không quá 12kg"
             }
+        ],
+        "seatCol": [
+            {
+                "col": "A",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [2, 3, 5, 7, 9]
+            },
+            {
+                "col": "B",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 1,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "C",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "D",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "E",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 1,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "F",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            }
         ]
     },
     {
@@ -72,16 +125,6 @@
         "economyPrice": 2340000,
         "businessPrice": 5860000,
         "numberSeatLeft": "8",
-        "seatsLeft": [
-            1,
-            9,
-            12,
-            15,
-            20,
-            30,
-            33,
-            34
-        ],
         "flightNumber": "VN 6025",
         "departureAirport": "Sân bay Tân Sơn Nhất, Việt Nam",
         "arrivalAirport": "Sân bay Nội Bài, Việt Nam",
@@ -125,6 +168,179 @@
                 "refundFee": 180000,
                 "checkedBaggage": "1 x 35 kg",
                 "carryOn": "Không quá 12kg"
+            }
+        ],
+        "seatCol": [
+            {
+                "col": "A",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [2, 3, 5, 7, 9]
+            },
+            {
+                "col": "B",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 1,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "C",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "D",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "E",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 1,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "F",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 2,
+                "soldoutSeat": [1,3, 4, 5, 9, 11, 13]
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "departureTime": "13:10",
+        "arrivalTime": "15:10",
+        "departureCode": "SGN",
+        "arrivalCode": "PQ",
+        "duration": "2 giờ 0 phút",
+        "airline": "Pacific Airlines",
+        "economyPrice": 1340000,
+        "businessPrice": 3860000,
+        "numberSeatLeft": "8",
+        "flightNumber": "VN 0342",
+        "departureAirport": "Sân bay Tân Sơn Nhất, Việt Nam",
+        "arrivalAirport": "Sân bay Nội Bài, Việt Nam",
+        "departureDate": "Thứ Tư, 20 tháng 11, 2024",
+        "aircraft": "AIRBUS A321",
+        "economyOptions": [
+            {
+                "id": "eco1",
+                "name": "Phổ Thông Tiêu Chuẩn",
+                "price": 1340000,
+                "changeFee": 860000,
+                "refundFee": 860000,
+                "checkedBaggage": "1 x 23 kg",
+                "carryOn": "Không quá 12kg"
+            },
+            {
+                "id": "eco2",
+                "name": "Phổ Thông Linh Hoạt",
+                "price": 1955000,
+                "changeFee": 720000,
+                "refundFee": 720000,
+                "checkedBaggage": "1 x 23 kg",
+                "carryOn": "Không quá 12kg"
+            }
+        ],
+        "businessOptions": [
+            {
+                "id": "bus1",
+                "name": "Thương Gia Tiêu Chuẩn",
+                "price": 2955000,
+                "changeFee": 360000,
+                "refundFee": 360000,
+                "checkedBaggage": "1 x 35 kg",
+                "carryOn": "Không quá 12kg"
+            },
+            {
+                "id": "bus2",
+                "name": "Thương Gia Linh Hoạt",
+                "price": 3582000,
+                "changeFee": 180000,
+                "refundFee": 180000,
+                "checkedBaggage": "1 x 35 kg",
+                "carryOn": "Không quá 12kg"
+            }
+        ],
+        "seatCol": [
+            {
+                "col": "A",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [2, 3, 5, 7, 9]
+            },
+            {
+                "col": "B",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 1,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "C",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "D",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "E",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 1,
+                "missNormal": 0,
+                "soldoutSeat": [1, 2, 5, 8, 9, 11, 12]
+            },
+            {
+                "col": "F",
+                "rowBusiness": 4,
+                "rowNormal": 10,
+                "missBusiness": 0,
+                "missNormal": 2,
+                "soldoutSeat": [1,3, 4, 5, 9, 11, 13]
             }
         ]
     }
