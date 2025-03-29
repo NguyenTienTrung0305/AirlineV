@@ -9,6 +9,9 @@ import flights from "@/data/flights.json"
 import { FlightCard } from "@/components/FlightComponent/FlightCard"
 import AOS from "aos";
 import "aos/dist/aos.css";
+import Link from "next/link";
+import { Button } from "@/components/ui/button"
+
 
 export default function FlightBooking() {
     const [isLoading, setIsLoading] = useState(false)
@@ -44,7 +47,7 @@ export default function FlightBooking() {
             />
 
             <div className="flex flex-col lg:flex-row gap-4 p-4 bg-gray-100 min-h-screen max-w-7xl m-auto" data-aos="fade-up-left">
-                <FlightFilter data-aos="fade-down"/>
+                <FlightFilter data-aos="fade-down" />
                 <div className="flex-1 gap-y-4">
                     {!isLoading && (
                         <FlightSelectionNotice />
@@ -63,6 +66,12 @@ export default function FlightBooking() {
                             flights={flights}
                         />
                     )}
+
+                    <Link href="/" className="w-full">
+                        <Button variant="default" className="p-3 bg-orange w-full mt-4">
+                            Quay lại trang chủ
+                        </Button>
+                    </Link>
                 </div>
             </div>
         </div>

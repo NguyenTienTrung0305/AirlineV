@@ -34,7 +34,7 @@
 .transition-bg {
   transition: 0.5s all ease-in-out;
 }
-  
+
 .custom-dot-list-style.react-multi-carousel-dot-list {
   display: flex;
   justify-content: center;
