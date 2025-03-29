@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogOverlay, DialogPortal } from "../ui/dialog";
 import { useState } from "react";
 import { BsFillAirplaneEnginesFill } from "react-icons/bs";
+import { useRouter } from "next/router";
+
 export function FlightCard({ flights }) {
     const [expandedFlight, setExpandedFlight] = useState(null);
     const [expandedClass, setExpandedClass] = useState(null);
@@ -295,34 +297,34 @@ export function FlightCard({ flights }) {
                                             let businessMissed = 0;
                                             let normalMissed = 0;
                                             return (
-                                            <div key={index} className="flex flex-col items-center">
-                                                <div className="absolute lg:w-2 w-1 bg-orange -left-2 rounded-l-[10px] top-[230px] bottom-[10px]"></div>
-                                                <div className="absolute lg:w-2 w-1 bg-orange -right-2 rounded-r-[10px] top-[230px] bottom-[10px]"></div>
-                                                <h1 className="min-h-[2rem]">{seat.col}</h1>
-                                                <div className="flex flex-col items-center">
+                                                <div key={index} className="flex flex-col items-center">
+                                                    <div className="absolute lg:w-2 w-1 bg-orange -left-2 rounded-l-[10px] top-[230px] bottom-[10px]"></div>
+                                                    <div className="absolute lg:w-2 w-1 bg-orange -right-2 rounded-r-[10px] top-[230px] bottom-[10px]"></div>
+                                                    <h1 className="min-h-[2rem]">{seat.col}</h1>
+                                                    <div className="flex flex-col items-center">
 
-                                                    {/* business row */}
-                                                    {[...Array(seat.rowBusiness)].map((_, index_) => {
-                                                        const rowNumber = index_ + 1
-                                                        // miss seats
+                                                        {/* business row */}
+                                                        {[...Array(seat.rowBusiness)].map((_, index_) => {
+                                                            const rowNumber = index_ + 1
+                                                            // miss seats
                                                             if (businessMissed < seat.missBusiness) {
                                                                 businessMissed += 1;
-                                                            return <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>;
-                                                        }
+                                                                return <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>;
+                                                            }
 
-                                                        return seat.col !== '' ? (
+                                                            return seat.col !== '' ? (
                                                                 seat.soldoutSeat && seat.soldoutSeat.includes(rowNumber) ? ( // soldout seats
-                                                                <Sofa
-                                                                    key={index_}
-                                                                    className="w-7 h-7 min-h-[1.8rem] text-black cursor-not-allowed"
-                                                                />
-                                                            ) : (
-                                                                <Sofa
-                                                                    key={index_}
+                                                                    <Sofa
+                                                                        key={index_}
+                                                                        className="w-7 h-7 min-h-[1.8rem] text-black cursor-not-allowed"
+                                                                    />
+                                                                ) : (
+                                                                    <Sofa
+                                                                        key={index_}
                                                                         className={`w-7 h-7 min-h-[1.8rem]
                                                                             ${selectedSeats.includes(`${seat.col}-${rowNumber}`)
-                                                                        ? 'text-orange'
-                                                                        : 'text-teal-700'
+                                                                                ? 'text-orange'
+                                                                                : 'text-teal-700'
                                                                             }
                                                                             ${expandedClass === 'economy'
                                                                                 ? 'cursor-not-allowed'
@@ -334,42 +336,42 @@ export function FlightCard({ flights }) {
                                                                                 ? undefined // Không cho phép click
                                                                                 : () => handleSeatClick(seat.col, rowNumber)
                                                                         }
-                                                                />
-                                                            )
-                                                        ) : (
-                                                            <h1 key={index_} className="h-7 min-h-[1.8rem] pt-[2px]">
-                                                                {index_ + 1}
-                                                            </h1>
-                                                        );
-                                                    })}
+                                                                    />
+                                                                )
+                                                            ) : (
+                                                                <h1 key={index_} className="h-7 min-h-[1.8rem] pt-[2px]">
+                                                                    {index_ + 1}
+                                                                </h1>
+                                                            );
+                                                        })}
 
-                                                    {/* Spacer between business row and normal row */}
-                                                    <div className="w-7 h-4 min-h-[1rem]"></div>
+                                                        {/* Spacer between business row and normal row */}
+                                                        <div className="w-7 h-4 min-h-[1rem]"></div>
 
-                                                    {/* normal row */}
-                                                    {[...Array(seat.rowNormal)].map((_, index_) => {
-                                                        const adjustedIndex = index_ + 4;
-                                                        const rowNumber = adjustedIndex + 1
+                                                        {/* normal row */}
+                                                        {[...Array(seat.rowNormal)].map((_, index_) => {
+                                                            const adjustedIndex = index_ + 4;
+                                                            const rowNumber = adjustedIndex + 1
                                                             if (normalMissed < seat.missNormal) {
                                                                 normalMissed += 1
-                                                            return <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>;
-                                                        }
-                                                        return seat.col !== '' ? (
-                                                            seat.soldoutSeat && seat.soldoutSeat.includes(rowNumber) ? (
-                                                                <Sofa
-                                                                    key={index_}
-                                                                    className="w-7 h-7 min-h-[1.8rem] text-[#000000] cursor-not-allowed"
-                                                                />
-                                                            ) : (
+                                                                return <div key={index_} className="w-7 h-7 min-h-[1.8rem]"></div>;
+                                                            }
+                                                            return seat.col !== '' ? (
+                                                                seat.soldoutSeat && seat.soldoutSeat.includes(rowNumber) ? (
+                                                                    <Sofa
+                                                                        key={index_}
+                                                                        className="w-7 h-7 min-h-[1.8rem] text-[#000000] cursor-not-allowed"
+                                                                    />
+                                                                ) : (
                                                                     <Sofa
                                                                         key={adjustedIndex}
                                                                         className={`w-7 h-7 min-h-[1.8rem] ${expandedClass === 'business'
-                                                                                ? 'cursor-not-allowed'
-                                                                                : 'cursor-pointer hover:scale-125'
+                                                                            ? 'cursor-not-allowed'
+                                                                            : 'cursor-pointer hover:scale-125'
                                                                             } ${selectedSeats.includes(`${seat.col}-${rowNumber}`) &&
                                                                                 (seat.col === 'A' || seat.col === 'F') &&
                                                                                 rowNumber >= 7
-                                                                            ? 'text-blue-700'
+                                                                                ? 'text-blue-700'
                                                                                 : selectedSeats.includes(`${seat.col}-${rowNumber}`)
                                                                                     ? 'text-[#35AB58]'
                                                                                     : 'text-teal-700'
@@ -378,17 +380,17 @@ export function FlightCard({ flights }) {
                                                                             expandedClass === 'business'
                                                                                 ? undefined // Không cho phép click
                                                                                 : () => handleSeatClick(seat.col, rowNumber)
-                                                                    }
-                                                                />
-                                                            )
-                                                        ) : (
-                                                            <h1 key={adjustedIndex} className="h-7 min-h-[1.8rem] pt-[2px]">
-                                                                {adjustedIndex + 1}
-                                                            </h1>
-                                                        );
-                                                    })}
+                                                                        }
+                                                                    />
+                                                                )
+                                                            ) : (
+                                                                <h1 key={adjustedIndex} className="h-7 min-h-[1.8rem] pt-[2px]">
+                                                                    {adjustedIndex + 1}
+                                                                </h1>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
-                                            </div>
                                             )
                                         })}
                                     </div>
