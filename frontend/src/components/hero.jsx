@@ -52,7 +52,7 @@ export default function Hero() {
                 autoPlay
                 muted
                 loop
-                Loading="lazy"
+                loading="lazy"
                 className="absolute z-10 w-full h-full lg:top-0 -top-[14vh] object-cover opacity-1"
             >
                 <source src="./video.mp4" type="video/mp4" />

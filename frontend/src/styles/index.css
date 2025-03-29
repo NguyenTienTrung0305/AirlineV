@@ -35,6 +35,33 @@
   transition: 0.5s all ease-in-out;
 }
   
+.custom-dot-list-style.react-multi-carousel-dot-list {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  position: absolute;
+  bottom: 10px; 
+}
+
+.custom-dot-list-style .react-multi-carousel-dot button {
+  background-color: #ccc; /* Màu xám cho chấm không active */
+  border: none;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  transition: background-color 0.3s;
+}
+
+/* Style cho chấm active */
+.custom-dot-list-style .react-multi-carousel-dot--active button {
+  background-color: red; /* Màu trắng cho chấm active */
+}
+
+.carousel-news .react-multiple-carousel__arrow:hover {
+  background-color: red;
+}
+
+  
 @layer base {
   :root {
     --background: 0 0% 100%;
