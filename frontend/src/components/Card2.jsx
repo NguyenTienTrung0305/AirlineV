@@ -69,7 +69,7 @@ const FeaturedCard2 = React.forwardRef((({ slug, image, title, description, date
 
 
 const Card2 = React.forwardRef(({ slug, image, title, description, content, buttonText, className, ...props }, ref) => (
-    <Card ref={ref} className={cn("border-2 border-border rounded-xl shadow-lg hover:scale-105 transition-transform duration-300 ease-linear",className)} {...props}>
+    <Card ref={ref} className={cn("border-2 border-border rounded-xl shadow-lg hover:scale-105 transition-all duration-300 ease-linear", className)} {...props}>
         <Link href={`/news/${slug}`}>
             {image && (
                 <Image
