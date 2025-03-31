@@ -26,10 +26,10 @@ export default function Footer() {
           <div className="border-t border-[#A9A8B6] pt-[15px]">
             <ul className="flex flex-col gap-4">
               <a href="#" className="flex items-center gap-2 hover:text-orange">
-                <MdPhone className="text-orange" /> +84 123 456 789
+                <MdPhone className="text-orange" /> +84 033 330 303
               </a>
               <a href="#" className="flex items-center gap-2 hover:text-orange">
-                <MdOutlineMailOutline className="text-orange" /> qairline-support@qairline.website
+                <MdOutlineMailOutline className="text-orange" /> airlinev-support@airlinev.website
               </a>
               <a href="#" className="flex items-center gap-2 hover:text-orange">
                 <MdOutlineLocationOn className="text-orange" /> Nhà E3, 144 Xuân Thủy, quận Cầu Giấy, Hà Nội , Việt Nam

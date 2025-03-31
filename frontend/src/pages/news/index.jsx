@@ -3,6 +3,9 @@ import dynamic from "next/dynamic";
 import "react-multi-carousel/lib/styles.css";
 import newsdata from "@/data/news.json"
 import { FeaturedCard2, Card2 } from '@/components/Card2';
+import { Button } from '@/components/ui/button';
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 const Carousel = dynamic(() => import("react-multi-carousel"), { ssr: false })
 
@@ -28,9 +31,31 @@ const responsive = {
 
 
 export default function News() {
+    const [visibleCount, setVisibleCount] = useState(3)
+    const [expand, isExpanded] = useState(false);
+
+    // handle click xem them
+    const handleMore = () => {
+        if (expand) {
+            setVisibleCount(3)
+        }
+        else {
+            setVisibleCount(newsdata.length)
+        }
+        isExpanded(!expand)
+    }
+
+
+    useEffect(() => {
+        AOS.init({
+            duration: 1500,
+            once: true
+        })
+    }, [])
+
     return (
         <main className='container mx-auto px-4 py-8'>
-            <section className='mb-12'>
+            <section className='mb-12' data-aos="fade-right">
                 <h2 className='text-3xl font-bold mb-6 text-teal-600'>
                     Bài viết nổi bật
                 </h2>
@@ -57,12 +82,18 @@ export default function News() {
             </section>
 
             {/* Phần Tin Tức Mới Nhất */}
-            <section>
-                <h2 className="text-3xl font-bold mb-6 text-gray-900">
-                    Tin tức mới nhất
-                </h2>
+            <section data-aos="fade-up">
+                <div className='flex flex-row justify-between w-full pb-3'>
+                    <h2 className="text-3xl font-bold mb-6 text-gray-900">
+                        Tin tức mới nhất
+                    </h2>
+                    <Button variant="orange" className="p-4 h-[50px]" onClick={handleMore}>
+                        {expand ? "Ẩn bớt" : "Xem thêm"}
+                    </Button>
+                </div>
+
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {newsdata.map((article, index) => (
+                    {newsdata.slice(0, visibleCount).map((article, index) => (
                         <Card2 key={index} {...article} />
                     ))}
                 </div>
