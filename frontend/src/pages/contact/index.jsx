@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 // import { Textarea } from "@/components/ui/textarea"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { TextArea } from '@/components/ui/textarea'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 // import { Label } from "@/components/ui/label"
 // import { Alert, AlertDescription } from "@/components/ui/alert"
 
@@ -42,6 +43,9 @@ export default function ContactPage() {
             subject: '',
             message: ''
         })
+
+        await new Promise(resolve => setTimeout(resolve, 2000))
+        setNoti("")
     }
 
 
@@ -168,6 +172,13 @@ export default function ContactPage() {
                                     {isSending ? "Sending Message..." : "Send Message"}
                                 </Button>
                             </form>
+
+                            {noti && (
+                                <Alert className="mt-4">
+                                    <AlertDescription>{noti}</AlertDescription>
+                                </Alert>
+                            )}
+
                         </CardContent>
                     </Card>
                 </div>
