@@ -2,6 +2,7 @@ import MainLayout from "@/layouts/MainLayout";
 import { useRouter } from "next/router";
 import '@/styles/index.css';
 import { AuthProvider } from "@/auth/auth";
+import AdminLayout from "@/layouts/AdminLayout";
 
 // Component: là trang hiện tại được render, Khi bạn truy cập một trang (/about, /contact...), Next.js tự động truyền trang tương ứng vào Component
 // pageProps:  là các dữ liệu (props) mà Next.js truyền vào trang hiện tại
@@ -10,9 +11,23 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <AuthProvider>
-      <MainLayout>
-        <Component {...pageProps} />
-      </MainLayout>
+      {
+        router.pathname === '/admin'
+          ? (<Component {...pageProps} />) // trang đăng nhập của admin
+          : router.pathname.startsWith('/admin')
+            // admin page (admin/dasboard,...)
+            ? (
+              <AdminLayout>
+                <Component {...pageProps} />
+              </AdminLayout>
+            )
+            // userpage
+            : (
+              <MainLayout>
+                <Component {...pageProps} />
+              </MainLayout>
+            )
+      }
     </AuthProvider>
   );
 }
