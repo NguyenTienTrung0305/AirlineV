@@ -15,6 +15,7 @@
         "arrivalAirport": "Sân bay Tân Sơn Nhất, Việt Nam",
         "departureDate": "Thứ Tư, 20 tháng 11, 2024",
         "aircraft": "AIRBUS A321",
+        "status": "OnTime",
         "economyOptions": [
             {
                 "id": "eco1",
@@ -128,8 +129,9 @@
         "flightNumber": "VN 6025",
         "departureAirport": "Sân bay Tân Sơn Nhất, Việt Nam",
         "arrivalAirport": "Sân bay Nội Bài, Việt Nam",
-        "departureDate": "Thứ Tư, 20 tháng 11, 2024",
+        "departureDate": "Thứ Bảy, 29 tháng 10, 2024",
         "aircraft": "AIRBUS A321",
+        "status": "OnTime",
         "economyOptions": [
             {
                 "id": "eco1",
@@ -243,8 +245,9 @@
         "flightNumber": "VN 0342",
         "departureAirport": "Sân bay Tân Sơn Nhất, Việt Nam",
         "arrivalAirport": "Sân bay Nội Bài, Việt Nam",
-        "departureDate": "Thứ Tư, 20 tháng 11, 2024",
+        "departureDate": "Thứ Hai, 21 tháng 2, 2025",
         "aircraft": "AIRBUS A321",
+        "status": "Landed",
         "economyOptions": [
             {
                 "id": "eco1",
