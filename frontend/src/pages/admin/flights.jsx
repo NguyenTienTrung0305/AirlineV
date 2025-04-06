@@ -6,8 +6,18 @@ import { Plus, Search } from 'lucide-react'
 import { useRouter } from "next/router";
 import flights from '@/data/flights.json'
 import { Badge } from "@/components/ui/badge";
+import { AddFlightDialog } from "@/components/admin/addflights";
+import { useState } from "react";
+import { EditFlightDialog } from "@/components/admin/editflight";
 
 export default function ScheduledFlights() {
+    const [searchQuery, setSearchQuery] = useState("")
+    const [editingFlight, setEditingFlight] = useState(null)
+
+
+    // check auth
+
+    // handle remove => api
 
 
     // getBadge
@@ -22,26 +32,42 @@ export default function ScheduledFlights() {
                     <Badge className="bg-yellow-400 hover:bg-yellow-400 text-black">Đã Hạ Cánh</Badge>
                 )
             default:
+                return (
+                    <div className="flex gap-2 justify-center">
+                        <Button className="bg-cyan-500 hover:bg-cyan-600 text-white text-sm px-3 py-1 h-7"
+                            onClick={() => setEditingFlight(flight)}
+                        >
+                            Sửa
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            // onClick={() => handleRemove(flight.id)}
+                            className="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 h-7"
+                        >
+                            Hủy
+                        </Button>
+                    </div>
+                )
         }
     }
+
+
+    // editing flights
 
     return (
         <div className="lg:mx-auto lg:pl-64 pt-10 space-y-6 mx-0 pl-0">
             <div className="flex flex-col gap-4 mx-5 md:mx-[16%]">
                 <div className="flex justify-between w-full">
                     <p className="font-bold text-2xl text-shadow tracking-tighter">QUẢN LÝ CHUYẾN BAY</p>
-                    <Button variant="default" className="p-2 w-[160px] bg-orange">
-                        <Plus />
-                        CHUYẾN BAY MỚI
-                    </Button>
+                    <AddFlightDialog />
                 </div>
 
                 <div className="relative mb-6">
                     <Input
                         type="text"
                         placeholder="Tìm kiếm chuyến bay sử dụng tên tàu bay hoặc số hiệu chuyến"
-                        // value={searchQuery}
-                        // onChange={(e) => setSearchQuery(e.target.value)}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-4 pr-10 h-10 border rounded"
                     />
                     <Button
@@ -67,7 +93,10 @@ export default function ScheduledFlights() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {flights.map((flight, index) => (
+                            {flights.filter(
+                                flight => flight.flightNumber?.replace(/\s/g, "").toLowerCase().includes(searchQuery.trim().toLowerCase()) ||
+                                    flight.aircraft?.replace(/\s/g, "").toLowerCase().includes(searchQuery.trim().toLowerCase())
+                            ).map((flight, index) => (
                                 <TableRow key={flight.id} className={index % 2 === 0 ? "bg-white" : 'bg-slate-200'}>
                                     <TableCell>{flight.flightNumber}</TableCell>
                                     <TableCell>{flight.aircraft}</TableCell>
@@ -76,7 +105,7 @@ export default function ScheduledFlights() {
                                     <TableCell>{flight.economyPrice}</TableCell>
                                     <TableCell>{flight.businessPrice}</TableCell>
                                     <TableCell>
-                                        <div className="flex gap-2">
+                                        <div>
                                             {getStatusBadge(flight)}
                                         </div>
                                     </TableCell>
@@ -85,6 +114,13 @@ export default function ScheduledFlights() {
                         </TableBody>
                     </Table>
                 </div>
+
+                {editingFlight && (
+                    <EditFlightDialog
+                        flight={editingFlight}
+                        onClose={() => setEditingFlight(null)}
+                    />
+                )}
             </div>
         </div>
     )

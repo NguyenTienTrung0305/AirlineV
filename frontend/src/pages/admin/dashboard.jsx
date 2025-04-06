@@ -30,35 +30,7 @@ export default function Dashboard() {
         "revenue": 1466899075
     })
 
-    // useEffect(() => {
-    //     const token = localStorage.getItem('token')
-    //     if (!token) {
-    //         router.push('/admin')
-    //     }
-    //     getStatistic()
-    // }, [router])
-
-    // const getStatistic = async () => {
-    //     const getStatisticApi = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/statistic`
-
-    //     try {
-    //         const response = await fetch(getStatisticApi, {
-    //             method: "GET",
-    //         })
-    //         if (!response.ok) {
-    //             throw new Error("Send request failed")
-    //         }
-
-    //         const res = await response.json()
-    //         setData(res.data)
-    //     } catch (error) {
-    //         toast({
-    //             title: "Lỗi",
-    //             description: "Đã có lỗi xảy ra khi kết nối với máy chủ, vui lòng tải lại trang hoặc đăng nhập lại",
-    //             variant: "destructive"
-    //         })
-    //     }
-    // }
+    // check auth and get data
 
     return (
         <div className=" lg:mx-auto pt-10 lg:pl-64 mx-0 pl-0 space-y-6">
