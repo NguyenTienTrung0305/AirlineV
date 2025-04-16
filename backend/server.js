@@ -8,11 +8,9 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-app.get('/', (req, res) => {
-    res.send('Hello từ backend!');
-});
+initWebRoutes(app)
 
-app.listen(config.port, () => {
-    console.log(`Server is live @ ${config.hostUrl}`)
+app.listen(config.port || 8080 , () => {
+    console.log(`Server is live @ http://${config.host}:${config.port}`)
 })
 
