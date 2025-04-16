@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const instance = axios.create({
-    baseURL: process.env.PUBLIC_API_BASE_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_BASE_URL
+    ,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -27,8 +28,17 @@ instance.interceptors.request.use(
     }
 );
 
+// response sẽ là 1 object có cấu trúc như sau:
+// {
+//     data: {...},         // ✅ Dữ liệu trả về từ server (chính là `res.send(...)`)
+//     status: 200,         // Mã HTTP (200, 400, 500...)
+//     statusText: "OK",    // Chuỗi mô tả status (thường là "OK")
+//     headers: {...},      // Các header từ response (ví dụ Content-Type)
+//     config: {...},       // Cấu hình của request (method, URL, headers gửi đi, v.v.)
+//     request: {}          // XMLHttpRequest hoặc Request object gốc
+// }
 instance.interceptors.response.use(
-    (response) => response.data,
+    (response) => response,
     (error) => {
         if (error.response?.status === 401) {
             localStorage.removeItem('token')

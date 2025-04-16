@@ -8,7 +8,7 @@ const loginUserApi = (email, password) => {
 }
 
 const signupUserApi = (formData) => {
-    const BASE_URL_API = '/api/signup' // fetch to backend localhost://3000/api/signup
+    const BASE_URL_API = '/api/user/new' // fetch to backend localhost://3000/api/signup
     const data = {
         firstName: formData.firstName,
         lastName: formData.lastName,
