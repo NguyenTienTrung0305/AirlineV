@@ -5,7 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-export default function Login() {
+import { useSignupForm } from "@/hooks/useSignupForm";
+import { useRouter } from "next/router";
+
+export default function Sigup() {
+    const router = useRouter();
+
+    const {
+        formData,
+        loading,
+        handleInputChange,
+        handleSubmit,
+    } = useSignupForm(() => router.push('/login'));
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-[url(/clouds-background.jpg)] bg-cover bg-center p-5">
             <div className="max-w-lg w-full bg-white rounded-md shadow-lg">
@@ -13,7 +25,7 @@ export default function Login() {
                 <p className="text-gray  text-md text-center">Nhập thông tin của bạn để đăng ký tài khoản mới</p>
 
                 <div>
-                    <form className="space-y-4 px-6 py-6">
+                    <form className="space-y-4 px-6 py-6" onSubmit={handleSubmit}>
                         <div className="space-y-2">
                             <div className="flex justify-between pb-4 w-full">
                                 <div className="space-y-2 w-[45%]">
@@ -22,12 +34,13 @@ export default function Login() {
                                     </label>
                                     <Input
                                         id="firstname"
-                                        name="firstname"
+                                        name="firstName"
                                         type="text"
                                         placeholder="Nguyễn"
                                         required
+                                        value={formData.firstName}
+                                        onChange={handleInputChange}
                                         className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
-
                                     />
                                 </div>
 
@@ -37,10 +50,12 @@ export default function Login() {
                                     </label>
                                     <Input
                                         id="lastname"
-                                        name="lastname"
+                                        name="lastName"
                                         type="text"
                                         placeholder="John"
                                         required
+                                        value={formData.lastName}
+                                        onChange={handleInputChange}
                                         className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
 
                                     />
@@ -56,6 +71,8 @@ export default function Login() {
                                 type="email"
                                 placeholder="email@example.com"
                                 required
+                                value={formData.email}
+                                onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
 
                             />
@@ -71,19 +88,23 @@ export default function Login() {
                                 type={"password"}
                                 required
                                 className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
+                                value={formData.password}
+                                onChange={handleInputChange}
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                            <label htmlFor="repeat_password" className="text-sm font-medium text-gray-700">
                                 Repeat Password
                             </label>
                             <Input
-                                id="password"
-                                name="password"
+                                id="repeat_password"
+                                name="confirmPassword"
                                 type={"password"}
                                 required
                                 className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
+                                value={formData.confirmPassword}
+                                onChange={handleInputChange}
                             />
                         </div>
 
@@ -91,8 +112,9 @@ export default function Login() {
                             type="submit"
                             variant="default"
                             className="w-full text-white p-2 text-xl bg-orange"
+                            disabled={loading}
                         >
-                            Đăng ký
+                            {loading ? "Đang đăng ký" : "Đăng ký"}
                         </Button>
                     </form>
 
@@ -123,7 +145,7 @@ export default function Login() {
                         <p className="text-md text-center text-gray-600">
                             Bạn đã có tài khoản?
                             <Link href="/login">
-                                <Button variant="link" className="p-0 text-[#e8604c] hover:text-[#d55643] text-md">
+                                <Button variant="link" className="p-0 text-[#e8604c] hover:text-[#d55643] text-md ml-2">
                                     Đăng Nhập
                                 </Button>
                             </Link>

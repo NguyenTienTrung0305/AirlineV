@@ -5,7 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
+import { useLoginForm } from "@/hooks/useLoginForm";
+import { useRouter } from "next/router";
+
 export default function Login() {
+    const router = useRouter()
+
+    const {
+        formData,
+        loading,
+        handleInputChange,
+        handleSubmit
+    } = useLoginForm(() => router.push("/"))
+
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-[url(/clouds-background.jpg)] bg-cover bg-center p-5">
             <div className="max-w-lg w-full bg-white rounded-md shadow-lg">
@@ -13,7 +25,7 @@ export default function Login() {
                 <p className="text-gray  text-md text-center">Nhập thông tin đăng nhập để truy cập tài khoản của bạn</p>
 
                 <div>
-                    <form className="space-y-4 px-6 py-6">
+                    <form className="space-y-4 px-6 py-6" onSubmit={handleSubmit}>
                         <div className="space-y-2">
                             <label htmlFor="email" className="text-sm font-medium text-gray-700">
                                 Email
@@ -25,7 +37,8 @@ export default function Login() {
                                 placeholder="email@example.com"
                                 required
                                 className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
-
+                                value={formData.email}
+                                onChange={handleInputChange}
                             />
                         </div>
 
@@ -39,6 +52,8 @@ export default function Login() {
                                 type={"password"}
                                 required
                                 className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-[#e8604c]"
+                                value={formData.password}
+                                onChange={handleInputChange}
                             />
                         </div>
 

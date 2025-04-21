@@ -2,6 +2,7 @@
 // useContext: Hook để truy cập giá trị từ Context trong các component con.
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { toast } from "@/hooks/useToast";
 
 // Làm "kho chứa" để chia sẻ trạng thái xác thực (isAuthenticated) và các hàm liên quan (login, logout) với bất kỳ component nào trong ứng dụng
 const AuthContext = createContext()
@@ -39,6 +40,11 @@ export const AuthProvider = ({ children }) => {
         router.push({
             pathname: '/login'
         })
+        toast({
+            title: "Đăng xuất thành công",
+            description: "Bạn đã đăng xuất",
+            variant: "default",
+        });
     }
 
     return (
