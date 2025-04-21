@@ -8,6 +8,10 @@ import { CiSearch } from "react-icons/ci";
 import { HiMenuAlt3 } from "react-icons/hi";
 import { MdClose } from "react-icons/md";
 import { FiSettings, FiLogOut } from "react-icons/fi";
+import { useAuth } from "@/auth/auth";
+import { Button } from "./ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { BsPersonCircle } from "react-icons/bs";
 
 
 export default function NavBar() {
@@ -19,10 +23,10 @@ export default function NavBar() {
         setDropdown(!dropdown)
     }
 
-    const [isAuthenticated, setAuthenticated] = useState(true)
+    const { isAuthenticated, logout } = useAuth();
 
     const handleLogout = () => {
-        setAuthenticated(false)
+        logout()
         setDropdown(false)
     }
 
@@ -95,21 +99,44 @@ export default function NavBar() {
                         <button className="rounded-full bg-[#faf5ee] text-gray w-10 h-10 flex items-center justify-center hover:bg-orange hover:text-white">
                             <CiSearch size={20} />
                         </button>
-
-                        <div className="rounded-lg flex items-center justify-center">
-                            <Link href="/login" >
-                                <button className="hover:text-white hover:bg-orange p-3 rounded-lg text-center ">
-                                    Đăng nhập
-                                </button>
-                            </Link>
-
-                            <Link href="/signup">
-                                <button className=" hover:text-white hover:bg-orange p-3 rounded-lg text-center ">
-                                    Đăng ký
-                                </button>
-                            </Link>
-
-                        </div>
+                        {isAuthenticated ? (
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button variant="ghost" className="rounded-full bg-[#faf5ee] text-gray w-10 h-10 flex items-center justify-center hover:bg-orange hover:text-white p-0">
+                                        <BsPersonCircle size={20} />
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-56">
+                                    <div className="grid gap-4">
+                                        <Link href="/my-account" className="flex items-center gap-2 text-sm">
+                                            <BsPersonCircle size={16} />
+                                            Thông tin tài khoản
+                                        </Link>
+                                        <Link href="/settings" className="flex items-center gap-2 text-sm">
+                                            <FiSettings size={16} />
+                                            Cài đặt
+                                        </Link>
+                                        <button onClick={logout} className="flex items-center gap-2 text-sm text-red-600">
+                                            <FiLogOut size={16} />
+                                            Đăng xuất
+                                        </button>
+                                    </div>
+                                </PopoverContent>
+                            </Popover>
+                        ) : (
+                            <div className="flex items-center gap-2">
+                                <Link href="/login">
+                                    <Button variant="ghost" className="hover:bg-orange hover:text-white p-2 text-md">
+                                        Đăng nhập
+                                    </Button>
+                                </Link>
+                                <Link href="/signup">
+                                    <Button variant="ghost" className="hover:bg-orange hover:text-white p-2 text-md">
+                                        Đăng ký
+                                    </Button>
+                                </Link>
+                            </div>
+                        )}
                     </div>
 
                     {/* icon dropdown menu*/}
@@ -180,7 +207,7 @@ export default function NavBar() {
                                             <li>
                                                 <button
                                                     onClick={handleLogout}
-                                                    className="w-full px-6 h-10 flex items-center leading-normal no-underline text-lg border-b border-gray-200 font-bold hover:text-orange gap-3 flex-1"
+                                                    className="w-full px-6 h-10 flex items-center leading-normal no-underline text-lg border-b border-gray-200 font-bold hover:text-orange gap-3 flex-1 text-red-600"
 
                                                 >
                                                     <FiLogOut />
@@ -194,8 +221,8 @@ export default function NavBar() {
                                             <li>
                                                 <Link
                                                     href="/login"
-                                                    className="px-6 h-10 flex items-center leading-normal no-underline font-bold text-lg border-b border-gray-200 text-orange  hover:text-orange"
-                                 
+                                                    className="px-6 h-10 flex items-center leading-normal no-underline font-bold text-lg border-b border-gray-200 text-teal-700  hover:text-orange"
+
                                                 >
                                                     Đăng nhập
                                                 </Link>
@@ -203,7 +230,7 @@ export default function NavBar() {
                                             <li>
                                                 <Link
                                                     href="/signup"
-                                                    className="px-6 h-10 flex items-center leading-normal no-underline font-bold text-lg border-b border-gray-200  hover:text-orange"
+                                                    className="px-6 h-10 flex items-center leading-normal no-underline font-bold text-lg border-b border-gray-200 text-teal-700 hover:text-orange"
                                                 >
                                                     Đăng ký
                                                 </Link>
