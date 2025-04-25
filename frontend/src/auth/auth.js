@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { toast } from "@/hooks/useToast";
+import { verifyTokenId } from "@/util/api";
 
 // Làm "kho chứa" để chia sẻ trạng thái xác thực (isAuthenticated) và các hàm liên quan (login, logout) với bất kỳ component nào trong ứng dụng
 const AuthContext = createContext()
@@ -14,10 +15,30 @@ export const AuthProvider = ({ children }) => {
     const router = useRouter()
 
     useEffect(() => {
-        const checkAuth = () => {
+        const checkAuth = async () => {
             const token = localStorage.getItem("token")
-            setIsAuthenticated(!!token) // chuyển token thành boolean
+            if (!token) {
+                setIsAuthenticated(false)
+            }
+
+            try {
+                const response = await verifyTokenId(token)
+                if (response.status === 200) {
+                    setIsAuthenticated(true)
+                } else {
+                    handleInvalidToken()
+                }
+            } catch (error) {
+                console.error("Token verification failed:", error);
+                handleInvalidToken();
+            }
         }
+
+        const handleInvalidToken = () => {
+            localStorage.removeItem("token");
+            setIsAuthenticated(false);
+        };
+
         checkAuth()
 
         // khi đăng xuất đăng nhập từ 1 tab khác, thay đổi giá trị storage => gọi lại checkAuth
