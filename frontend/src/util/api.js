@@ -1,9 +1,9 @@
 import axios from "./axiosCustom"
 
 // click button login trên frontend sẽ gọi làm này
-const loginUserApi = (email, password) => {
+const loginUserApi = (idToken) => {
     const BASE_URL_API = '/api/login' // fetch to backend localhost://3000/api/login
-    const data = { email: email, password: password }
+    const data = { idToken: idToken }
     return axios.post(BASE_URL_API, data)
 }
 
@@ -18,7 +18,15 @@ const signupUserApi = (formData) => {
     return axios.post(BASE_URL_API, data)
 }
 
+const verifyTokenId = (tokenId) => {
+    const BASE_URL_API = '/api/verifyToken';
+    return axios.get(BASE_URL_API, {
+        headers: { Authorization: `Bearer ${tokenId}` }
+    });
+};
+
 export {
     loginUserApi,
-    signupUserApi
+    signupUserApi,
+    verifyTokenId
 }
