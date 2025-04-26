@@ -12,41 +12,54 @@ const AuthContext = createContext()
 // AuthContext.Provider: Cung cấp isAuthenticated, login, và logout cho bất kỳ component nào nằm trong cây DOM bên dưới AuthProvider
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
+
     const router = useRouter()
+
+
+    const silentlyVerifyToken = async (token) => {
+        try {
+            const response = await verifyTokenId(token)
+            if (response.status === 200) {
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.log("Verification attempt failed silently:", error.message);
+            return false;
+        }
+    }
 
     useEffect(() => {
         const checkAuth = async () => {
             const token = localStorage.getItem("token")
+            console.log(token)
             if (!token) {
                 setIsAuthenticated(false)
+                return;
             }
 
-            try {
-                const response = await verifyTokenId(token)
-                if (response.status === 200) {
-                    setIsAuthenticated(true)
-                } else {
-                    handleInvalidToken()
-                }
-            } catch (error) {
-                console.error("Token verification failed:", error);
-                handleInvalidToken();
+            const isValid = await silentlyVerifyToken(token)
+            setIsAuthenticated(isValid);
+        }
+
+        // chỉ được gọi 1 lần duy nhất khi người dùng mở trang web (trừ khi họ reload lại, chuyển tab mới, hoặc logout và login lại)
+        checkAuth()
+
+        // Chỉ lắng nghe sự kiện localStorage.removeItem("token") - khi đăng xuất thực sự
+        const handleStorageChange = (e) => {
+            if (e.key === "token" && e.newValue === null) {
+                setIsAuthenticated(false)
+            }
+            // Nếu token được thêm mới từ tab khác, đánh dấu đã đăng nhập
+            else if (e.key === "token" && e.newValue) {
+                setIsAuthenticated(true)
             }
         }
 
-        const handleInvalidToken = () => {
-            localStorage.removeItem("token");
-            setIsAuthenticated(false);
-        };
+        window.addEventListener("storage", handleStorageChange)
 
-        checkAuth()
-
-        // khi đăng xuất đăng nhập từ 1 tab khác, thay đổi giá trị storage => gọi lại checkAuth
-        window.addEventListener("storage", checkAuth)
-
-        // Dọn dẹp listener khi component unmount để tránh lỗi
         return () => {
-            window.removeEventListener("storage", checkAuth)
+            window.removeEventListener("storage", handleStorageChange)
         }
     }, [])
 
