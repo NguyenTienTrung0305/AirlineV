@@ -18,7 +18,7 @@ export const createUser = async (req, res) => {
         // thêm newUser theo uid của nó
         userCache.set(newUser.uid, newUser)
 
-        // thêm newUser và cache users (danh sách tất cả users)
+        // thêm newUser vào cache users (danh sách tất cả users)
         const cacheAllUser = getCache(userCache, "users")
         if (cacheAllUser) {
             cacheAllUser.push(newUser)
