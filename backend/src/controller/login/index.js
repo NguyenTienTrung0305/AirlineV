@@ -1,37 +1,26 @@
-import firebase from "../../database/firebase.js"
-import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth"
-import admin from "../../database/firebaseAdmin.js"
+import { admin } from "../../database/firebaseAdmin.js"
 
 import { dbCreateUser, dbGetUserById } from "../../services/users/User.service.js"
 
-const firebaseAuth = getAuth(firebase)
-
-export const login = async (req, res) => {
-    const { email, password } = req.body
+// khi người dùng nhập email và password, firebase SDK sẽ xác thực và trả về idToken, sau đó gửi idToken này cho firebase-admin ở backend dể xác thực
+export const userLogin = async (req, res) => {
+    const { idToken } = req.body
 
     try {
-        const userCredential = await signInWithEmailAndPassword(
-            firebaseAuth,
-            email,
-            password
-        )
+        const decodeToken = await admin.auth().verifyIdToken(idToken)
+        const userId = decodeToken.uid
 
-        const user = userCredential.user
-        const userId = user.uid
-
-        // check again
-        const promiseGetUser = dbGetUserById(userId)
-        const promiseGetIdToken = user.getIdToken()
-        const [user_, idtoken] = await Promise.all([promiseGetUser, promiseGetIdToken])
+        const user = await dbGetUserById(userId)
 
         res.status(200).json({
-            user: user_,
-            token: idtoken,
+            user: user,
+            token: idToken,
             message: "Login Success"
         })
     } catch (err) {
-        res.status(400).json({ message: "Email or password is incorrect" })
+        res.status(401).json({ message: "Token không hợp lệ hoặc đã hết hạn" });
     }
+
 }
 
 // Khi người dùng nhấn vào icon Google:
@@ -40,52 +29,49 @@ export const login = async (req, res) => {
 // Sau khi thành công, Firebase frontend SDK sẽ trả về thông tin user + idToken
 // Bạn gửi idToken về backend để xác minh
 export const googleLogin = async (req, res) => {
-    const { idtoken } = req.body
+    const { idToken } = req.body
     try {
-        const decodeToken = await admin.auth().verifyIdToken(idtoken)
+        const decodeToken = await admin.auth().verifyIdToken(idToken)
         const uid = decodeToken.uid
 
         const userData = await dbGetUserById(uid);
         res.status(200).json({
             user: userData,
-            token: idtoken,
+            token: idToken,
             message: "Google login success",
         })
     }
 
     catch (error) {
         console.error("Google login failed:", error);
-        res.status(400).json({ message: "Google login failed" });
+        res.status(401).json({ message: "Google login failed" });
     }
 }
 
 
 
 export const adminLogin = async (req, res) => {
-    const { email, password } = req.body
+    const { idToken } = req.body;
     try {
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email and password are required" })
-        }
-        const userCredential = await admin.auth().signInWithEmailAndPassword(firebaseAuth, email, password)
-        const user = userCredential.user
-        const userId = user.uid
+        const decoded = await admin.auth().verifyIdToken(idToken);
 
-        // check again
-        const promiseGetAdmin = dbGetAdminById(userId)
-        const promiseGetIdToken = user.getIdToken()
-        const [admin, idtoken] = await Promise.all([promiseGetAdmin, promiseGetIdToken])
+        if (decoded.role !== "admin") {
+            return res.status(403).json({ message: "Bạn không có quyền truy cập với vai trò admin" });
+        }
+
+        const adminData = await dbGetAdminById(decoded.uid);
 
         res.status(200).json({
-            user: admin,
-            token: idtoken,
-            message: "Login Success"
-        })
-    }
-    catch (error) {
-        res.status(400).json({ message: "Email or password is incorrect" })
+            user: adminData,
+            token: idToken,
+            message: "Admin login success"
+        });
+    } catch (error) {
+        console.error("Admin login failed:", error);
+        res.status(401).json({ message: "Token không hợp lệ hoặc bạn không phải admin" });
     }
 }
+
 
 
 
