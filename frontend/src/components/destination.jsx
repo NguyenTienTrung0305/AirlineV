@@ -122,6 +122,7 @@ export default function Destination() {
                     <div className="flex-1 px-6 py-2" data-aos="fade-down">
                         <Image
                             src={"/image-6.jpg"}
+                            alt="moreinfo"
                             width={600}
                             height={600}
                             priority

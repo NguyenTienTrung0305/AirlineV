@@ -31,6 +31,10 @@ export default function Dashboard() {
     })
 
     // check auth and get data
+    useEffect(() => {
+        const token = localStorage.getItem('token')
+        
+    })
 
     return (
         <div className=" lg:mx-auto pt-10 lg:pl-64 mx-0 pl-0 space-y-6">

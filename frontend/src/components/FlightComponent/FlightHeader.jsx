@@ -7,6 +7,7 @@ export function FlightHeader({ departureCode, arrivalCode, departureCity, arriva
             <div className="relative h-[300px] w-full">
                 <Image
                     src="/tours_background.jpg"
+                    alt="bg-airline"
                     fill
                     objectFit="cover"
                     priority

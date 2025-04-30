@@ -22,10 +22,10 @@ import { cn } from "@/lib/utils"
 // <div class="rounded-lg border bg-blue-500 text-card-foreground shadow-sm p-6">
 //   Nội dung thẻ Card
 // </div>
-const Card = React.forwardRef(({ clasName, ...probs }, ref) => (
+const Card = React.forwardRef(({ className, ...probs }, ref) => (
     <div
         ref={ref}
-        clasName={cn("rounded-lg border bg-card text-card-foreground shadow-sm", clasName)}
+        className={cn("rounded-lg border bg-card text-card-foreground shadow-sm", className)}
         {...probs}
     />
 ))
