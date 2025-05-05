@@ -1,91 +1,199 @@
 import NodeCache from "node-cache"
-import admin from "../database/firebaseAdmin.js"
-
+import { admin, db } from "../database/firebaseAdmin.js"
 import { getCache, userCache } from "../cache/cache.js"
-import { doc, getDoc, getFirestore } from "firebase/firestore";
 
-const USER_COLLECTION_NAME = "customers";
+const USER_COLLECTION_NAME = "users";
 const ADMIN_COLLECTION_NAME = "admins";
 
-export const requireAuth = async (req, res, next) => {
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ message: "Unauthorized" })
+const SESSION_COOKIE_USER = 'userSession'
+const CSRF_COOKIE_USER = 'userCsrfToken'
+
+const SESSION_COOKIE_ADMIN = 'userSession'
+const CSRF_COOKIE_ADMIN = 'userCsrfToken'
+
+export const verifySessionAndCSRF = async (req, res, next) => {
+    const sessionCookie = req.cookies[SESSION_COOKIE_USER] || req.cookies[SESSION_COOKIE_ADMIN]
+    const csrfTokenClient = req.cookies['x-csrf-token'] || req.body.csrfToken || req.cookies[CSRF_COOKIE_USER] || req.cookies[CSRF_COOKIE_ADMIN]// Thường CSRF token được gửi qua header hoặc body
+
+    if (!sessionCookie || !csrfTokenClient) {
+        return res.status(403).json({
+            message: 'Thiếu session cookie hoặc CSRF token của user',
+            code: 'USER_CSRF_MISSING'
+        })
     }
-    const token = authHeader.split(" ")[1]
-
-
-    const isAdmin = req.headers["admin"] === "true"
-    const userCollectionName = isAdmin ? ADMIN_COLLECTION_NAME : USER_COLLECTION_NAME
 
     try {
-        const decoded = await admin.auth().verifyIdToken(token)
-        const userId = decoded.uid
+        const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true)
+        const userId = decodedClaims.uid
+        const expectedCsrfToken = req.session.csrfToken
 
+        if (!expectedCsrfToken || csrfTokenClient !== expectedCsrfToken) {
+            return res.status(403).json({
+                message: 'CSRF token của user không hợp lệ',
+                code: 'USER_CSRF_INVALID'
+            })
+        }
+
+        // chech cache
         const cacheUser = getCache(userCache, userId)
         if (cacheUser) {
             req.user = cacheUser
             return next()
         }
 
-        const userDocRef = doc(getFirestore(), userCollectionName, userId)
-        const userDoc = await getDoc(userDocRef)
-        if (!userDoc.exists()) {
-            return res.status(401).json({ message: "User not found" })
+        // get user from database
+        const userDocRef = db.collection(USER_COLLECTION_NAME).doc(userId)
+        const userDoc = await userDocRef.get()
+
+        if (!userDoc.exists) {
+            return res.status(401).json({
+                message: "Không tìm thấy người dùng",
+                code: "USER_NOT_FOUND"
+            })
         }
 
+        // store in cache
         const userData = { uid: userId, ...userDoc.data() }
         userCache.set(userId, userData)
         req.user = userData
-
         next()
-    } catch {
-        return res.status(401).json({ message: "Invalid token" })
+
+
+    } catch (error) {
+        return res.status(401).json({
+            message: 'Phiên đăng nhập user không hợp lệ',
+            code: 'INVALID_USER_SESSION'
+        })
     }
 }
 
-
-export const requireAuthWithoutCache = async (req, res, next) => {
-    const authHeader = req.headers.authorization
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ message: "Unauthorized" })
+export const isAdminRoute = (req, res, next) => {
+    if (req.session && req.session.role === 'admin') {
+        return next()
     }
-    const token = authHeader.split(" ")[1]
-    const isAdmin = req.headers["admin"] === "true"
-    const userCollectionName = isAdmin ? ADMIN_COLLECTION_NAME : USER_COLLECTION_NAME
+    return res.status(403).json({
+        message: 'Không có quyền truy cập admin',
+        code: 'UNAUTHORIZED_ADMIN'
+    })
+}
 
-    try {
-        const decoded = await admin.auth().verifyIdToken(token)
-        const userId = decoded.uid
-
-        const userDocRef = doc(getFirestore(), userCollectionName, userId);
-        const userDoc = await getDoc(userDocRef);
-
-        if (!userDoc.exists()) {
-            return res.status(404).send({
-                message: "User not found",
-            });
-        }
-
-        req.user = { uid: userId, ...userDoc.data() };
-
-        next();
+export const isUserRoute = (req, res, next) => {
+    if (req.session && req.session.role === 'user') {
+        return next()
     }
-    catch (error) {
-        return res.status(401).json({ message: "Invalid token" })
-    }
+    return res.status(403).json({
+        message: 'Không có quyền truy cập',
+        code: 'UNAUTHORIZED'
+    })
 }
 
 
-export const checkRole = (req, res, next) => {
-    try {
-        const user = req.user
-        if (user.role !== "admin") {
-            return res.status(403).json({ message: "You do not have permission to perform this action" })
-        }
-        next()
-    }
-    catch (error) {
-        return res.status(400).json({ message: error.message })
-    }
-}
+
+
+// export const requireAuth = async (req, res, next) => {
+//     try {
+//         const token = req.cookies.sessionToken
+//         if (!token) {
+//             return res.status(401).json({
+//                 message: "Không có phiên đăng nhập",
+//                 code: "NO_SESSION"
+//             })
+//         }
+
+//         const isAdmin = req.path.startsWith('/api/admin')
+//         const userCollectionName = isAdmin ? ADMIN_COLLECTION_NAME : USER_COLLECTION_NAME
+
+//         // verify firebase token
+//         const decoded = await admin.auth().verifyIdToken(token)
+//         const userId = decoded.uid
+
+//         // check cache first
+//         const cacheUser = getCache(userCache, userId)
+//         if (cacheUser) {
+//             req.user = cacheUser
+//             return next()
+//         }
+
+
+//         // get user from database
+//         const userDocRef = db.collection(userCollectionName).doc(userId)
+//         const userDoc = await userDocRef.get()
+
+//         if (!userDoc.exists) {
+//             return res.status(401).json({
+//                 message: "Không tìm thấy người dùng",
+//                 code: "USER_NOT_FOUND"
+//             })
+//         }
+
+
+//         const userData = { uid: userId, ...userDoc.data() }
+
+
+//         // check for admin access
+//         if (isAdmin && user.role !== 'admin') {
+//             return res.status(403).json({
+//                 message: "Không có quyền truy cập vào trang admin",
+//                 code: "INSUFFICIENT_PERMISSIONS"
+//             })
+//         }
+
+
+//         // store in cache
+//         userCache.set(userId, userData)
+//         req.user = userData
+//         next()
+//     } catch (error) {
+//         console.error("Auth verification error:", error);
+
+//         if (error.code === "auth/id-token-expired") {
+//             return res.status(401).json({
+//                 message: "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại",
+//                 code: "TOKEN_EXPIRED"
+//             });
+//         }
+
+//         return res.status(401).json({
+//             message: "Xác thực không hợp lệ",
+//             code: error.code || "INVALID_AUTH",
+//             error: process.env.NODE_ENV === "development" ? error.message : undefined
+//         });
+//     }
+// }
+
+
+
+// export const checkRole = (roles = []) => {
+//     // Cho phép truyền vào một vai trò hoặc một mảng vai trò
+//     if (typeof roles === 'string') {
+//         roles = [roles];
+//     }
+
+//     return (req, res, next) => {
+//         try {
+//             const user = req.user;
+
+//             if (!user) {
+//                 return res.status(401).json({
+//                     message: "Bạn cần đăng nhập để thực hiện hành động này",
+//                     code: "AUTH_REQUIRED"
+//                 });
+//             }
+
+//             if (roles.length && !roles.includes(user.role)) {
+//                 return res.status(403).json({
+//                     message: "Bạn không có quyền thực hiện hành động này",
+//                     code: "INSUFFICIENT_ROLE"
+//                 });
+//             }
+
+//             next();
+//         } catch (error) {
+//             console.error("Role check error:", error);
+//             return res.status(500).json({
+//                 message: "Lỗi hệ thống khi kiểm tra quyền truy cập",
+//                 code: "ROLE_CHECK_ERROR"
+//             });
+//         }
+//     };
+// };
