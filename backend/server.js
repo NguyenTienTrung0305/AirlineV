@@ -1,16 +1,57 @@
 import express from 'express'
+import session from 'express-session';
 import cors from "cors"
+import cookieParser from 'cookie-parser';
 import config from "./src/config/dotenv.config.js"
 import initWebRoutes from './src/routes/index.js'
 
 const app = express()
 
-app.use(cors())
+app.use(cookieParser())
+
+// Quản lý phiên người dùng ở phía server. Nó cung cấp các cơ chế để tạo, lưu trữ và truy xuất dữ liệu phiên liên quan đến từng người dùng
+// Khi một người dùng mới truy cập ứng dụng (hoặc phiên của họ hết hạn), express-session sẽ tạo một Session ID duy nhất cho họ dựa trên secret và bộ mã hóa
+// Nên kết nối với redis hoặc database trong môi trường production
+// Khác với Session Cookie (Cookie ở Frontend)
+// + Đây là một cookie HTTP được gửi từ server về trình duyệt (frontend) của người dùng
+// + Trong các request tiếp theo từ trình duyệt đó đến server, cookie này sẽ được tự động gửi đi trong header Cookie. 
+// Server (thông qua express-session middleware) sẽ sử dụng Session ID được gửi trong cookie này để xác định phiên của người dùng và truy 
+// cập dữ liệu phiên đã được lưu trữ ở backend
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 24 * 60 * 60 * 1000,
+    },
+    // store 
+}))
+
+
+const allowedOrigins = ['http://localhost:3000'] // Chỉ cho phép origin của frontend
+
+app.use(cors({
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin) || !origin) { // Thêm !origin để cho phép các request không có origin (ví dụ: từ server-side)
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    },
+    credentials: true // Bắt buộc phải là true để cho phép gửi/nhận cookie
+}))
+
+
+
 app.use(express.json())
 
 initWebRoutes(app)
 
-app.listen(config.port || 8080 , () => {
+app.listen(config.port || 8080, () => {
     console.log(`Server is live @ http://${config.host}:${config.port}`)
 })
 

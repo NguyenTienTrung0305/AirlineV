@@ -11,9 +11,14 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cloudinary": "^1.41.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "csurf": "^1.10.0",
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
+    "express-session": "^1.18.1",
     "firebase": "^11.6.0",
     "firebase-admin": "^13.2.0",
     "multer": "^1.4.5-lts.2",
@@ -25,7 +30,6 @@
     "@babel/core": "^7.26.10",
     "@babel/node": "^7.26.0",
     "@babel/preset-env": "^7.26.9",
-    "cloudinary": "^2.6.0",
     "nodemon": "^3.1.9"
   }
 }
