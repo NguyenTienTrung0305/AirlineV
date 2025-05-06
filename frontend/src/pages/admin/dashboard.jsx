@@ -6,6 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, Respon
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from '@/hooks/useToast'
+import { useAuth } from '@/auth/auth'
 
 const flightStatusData = [
     { name: 'Chưa Cất Cánh', value: 3 },
@@ -14,7 +15,7 @@ const flightStatusData = [
 ]
 
 const aircraftData = [
-    { name: 'Airbus A320', value: 4},
+    { name: 'Airbus A320', value: 4 },
     { name: 'Airbus A330', value: 2 },
     { name: 'Boeing 767', value: 1 },
     { name: 'Boeing 777', value: 2 }
@@ -24,6 +25,7 @@ const COLORS = ['#3b82f6', '#ef4444', '#84cc16', '#06b6d4']
 
 export default function Dashboard() {
     const router = useRouter()
+    const { isAdmin, isAuthenticated, loading } = useAuth()
     const [data, setData] = useState({
         "flights": 29,
         "tickets": 332,
@@ -32,9 +34,23 @@ export default function Dashboard() {
 
     // check auth and get data
     useEffect(() => {
-        const token = localStorage.getItem('token')
-        
-    })
+        if (!loading && (!isAuthenticated || !isAdmin)) {
+            router.push('/admin')
+        }
+
+    }, [router, isAuthenticated, isAdmin, loading])
+
+    if (loading) {
+        return <div>Đang kiểm tra xác thực...</div> // Hiển thị loading state
+    }
+
+    if (!isAuthenticated || !isAdmin) {
+        toast({
+            title: "Lỗi truy cập",
+            description: "Bạn không được phép truy cập vào trang này, vui lòng đăng nhập",
+            variant: "destructive"
+        })
+    }
 
     return (
         <div className=" lg:mx-auto pt-10 lg:pl-64 mx-0 pl-0 space-y-6">

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Eye, EyeOff } from 'lucide-react'
 
 import firebase from "@/auth/firebase";
@@ -36,19 +36,16 @@ export default function loginAdmin() {
         try {
             const auth = getAuth(firebase)
             const userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
-            const idToken = userCredential.user.getIdToken()
+            const idToken = await userCredential.user.getIdToken(true)
+        
 
             const response = await loginAdminApi(idToken)
             if (response.status === 200) {
-                // Refresh token để lấy custom claims mới
-                const newToken = await userCredential.user.getIdToken(true);
-
-                loginAdmin(newToken, response.data.user)
-                
                 toast({
                     title: "Đăng nhập thành công!",
                     description: "Chào mừng admin trở lại",
-                });
+                })
+                loginAdmin(response.data.admin)
                 router.push("/admin/dashboard")
             } else {
                 toast({
