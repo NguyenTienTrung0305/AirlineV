@@ -1,27 +1,8 @@
-import {
-    getFirestore,
-    collection,
-    collectionGroup,
+import { admin, db } from "../../database/firebaseAdmin.js"
 
-    doc,
-    getDoc,
-    getDocs,
-    setDoc,
-    updateDoc,
-    deleteDoc
-} from "firebase/firestore"
-
-import firebase from "../../database/firebase.js"
-import firebaseadmin from "../../database/firebaseAdmin.js"
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider } from "firebase/auth"
 import User from "../../models/users/User.model.js"
 
-
-const db = getFirestore(firebase)
-const adminAuth = firebaseadmin.auth()
-
 const USER_COLLECTION_NAME = "users"
-const firebaseAuth = getAuth(firebase)
 
 export const dbCreateUser = async ({
     email,
@@ -33,18 +14,20 @@ export const dbCreateUser = async ({
         // Tạo một tài khoản mới trên Firebase, với email và mật khẩu mà người dùng nhập từ từ form đăng ký
         // Lưu tài khoảng trên firebase, sử dụng cùng với firebase-client sdk để xác thực người dùng 
         // firebase-client sdk sẽ gửi thông tin đăng nhập đến firebase, Firebase kiểm tra xem email và mật khẩu 
-        // này có khớp với tài khoản nào đã được tạo trước đó không bằng adminAuth.createUser
-        const userPromise = adminAuth.createUser({ email: email, password: password })
+        // này có khớp với tài khoản nào đã được tạo trước đó không, nếu có trả về idToken
+        const userRecord =  await admin.auth().createUser({ email: email, password: password })
 
         const newUser = new User({ firstName, lastName, email })
         newUser.createdAt = new Date()
         newUser.updatedAt = new Date()
-
-        const user = await userPromise
-        newUser.uid = user.uid
-
-        const userref = doc(db, USER_COLLECTION_NAME, user.uid)
-        await setDoc(userref, newUser.toObject())
+        newUser.uid = userRecord.uid
+        
+        // tạo document mới có uid là userRecord.uid (chưa tồn tại thì firebase sẽ tự tạo), chứa các field của newUser
+        // users (collection)
+        // └── user123 (document uid)
+        //     └── { firstName: "John", email: "john@email.com", uid: "okjiKHNNajs"... }
+        const userRef = db.collection(USER_COLLECTION_NAME).doc(userRecord.uid) 
+        await userRef.set(newUser.toObject())
         return newUser
     }
     catch (error) {
@@ -55,11 +38,12 @@ export const dbCreateUser = async ({
 
 export const dbGetUserById = async (uid) => {
     try {
-        const userref = doc(db, USER_COLLECTION_NAME, uid)
-        const userDoc = await getDoc(userref)
+        const userRef = db.collection(USER_COLLECTION_NAME).doc(uid)
+        const userDoc = await userRef.get()
 
-        if (userDoc.exists()) {
+        if (userDoc.exists) {
             const user = new User({ ...userDoc.data() })
+            user.uid = userDoc.id
             return user
         }
 
@@ -72,17 +56,17 @@ export const dbGetUserById = async (uid) => {
 
 export const dbGetUserByEmail = async (email) => {
     try {
-        const usersRef = collection(db, USER_COLLECTION_NAME)
-        const query = query(usersRef, where("email", "==", email))
-        const querySnapshot = await getDocs(query)
+        const usersRef = db.collection(USER_COLLECTION_NAME)
+        const query = usersRef.where('email', '==', email)
+        const querySnapshot = await query.get()
 
         if (querySnapshot.empty) {
             throw new Error(`user not found: ${email}`)
         }
 
-        const user = new User({ ...querySnapshot.docs[0].data() })
-        user.uid = querySnapshot.docs[0].id
-
+        const userDoc = querySnapshot.docs[0]
+        const user = new User({ ...userDoc.data() })
+        user.uid = userDoc.id
         return user
     }
     catch (error) {
