@@ -13,12 +13,12 @@ const CSRF_COOKIE_ADMIN = 'userCsrfToken'
 
 export const verifySessionAndCSRF = async (req, res, next) => {
     const sessionCookie = req.cookies[SESSION_COOKIE_USER] || req.cookies[SESSION_COOKIE_ADMIN]
-    const csrfTokenClient = req.cookies['x-csrf-token'] || req.body.csrfToken || req.cookies[CSRF_COOKIE_USER] || req.cookies[CSRF_COOKIE_ADMIN]// Thường CSRF token được gửi qua header hoặc body
+    const csrfTokenClient = req.cookies['x-csrf-token'] || req.body.csrfToken || req.cookies[CSRF_COOKIE_USER] || req.cookies[CSRF_COOKIE_ADMIN]
 
     if (!sessionCookie || !csrfTokenClient) {
         return res.status(403).json({
-            message: 'Thiếu session cookie hoặc CSRF token của user',
-            code: 'USER_CSRF_MISSING'
+            message: 'Thiếu session cookie hoặc CSRF Token',
+            code: 'CSRF_MISSING'
         })
     }
 
@@ -29,8 +29,8 @@ export const verifySessionAndCSRF = async (req, res, next) => {
 
         if (!expectedCsrfToken || csrfTokenClient !== expectedCsrfToken) {
             return res.status(403).json({
-                message: 'CSRF token của user không hợp lệ',
-                code: 'USER_CSRF_INVALID'
+                message: 'CSRF token của không hợp lệ',
+                code: 'CSRF_INVALID'
             })
         }
 
@@ -42,13 +42,13 @@ export const verifySessionAndCSRF = async (req, res, next) => {
         }
 
         // get user from database
-        const userDocRef = db.collection(USER_COLLECTION_NAME).doc(userId)
+        const userDocRef = req.session?.role === 'user' ? db.collection(USER_COLLECTION_NAME).doc(userId) : db.collection(ADMIN_COLLECTION_NAME).doc(userId)
         const userDoc = await userDocRef.get()
 
         if (!userDoc.exists) {
             return res.status(401).json({
-                message: "Không tìm thấy người dùng",
-                code: "USER_NOT_FOUND"
+                message: "Không tìm thấy user hoặc admin",
+                code: "USER_OR_ADMIN_NOT_FOUND"
             })
         }
 
@@ -61,8 +61,8 @@ export const verifySessionAndCSRF = async (req, res, next) => {
 
     } catch (error) {
         return res.status(401).json({
-            message: 'Phiên đăng nhập user không hợp lệ',
-            code: 'INVALID_USER_SESSION'
+            message: 'Phiên đăng nhập không hợp lệ',
+            code: 'INVALID_SESSION'
         })
     }
 }
