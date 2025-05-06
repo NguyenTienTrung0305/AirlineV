@@ -1,14 +1,14 @@
 import express from 'express'
 import {
-    login,
+    userLogin,
     adminLogin,
     googleLogin
-} from '../../controller/login/index.js'
+} from '../../controller/auth/index.js'
 
 
 const router = express.Router()
 
-router.post('/', login)
+router.post('/user', userLogin)
 router.post('/admin', adminLogin)
 
 export default router
