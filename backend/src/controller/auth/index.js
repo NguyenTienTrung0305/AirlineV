@@ -105,7 +105,7 @@ export const adminLogin = async (req, res) => {
 
         res.cookie("adminSession", sessionCokies, {
             httpOnly: true,
-            path: "/admin", // Cookie chỉ có hiệu lực cho các route /admin*
+            path: "/api/admin", // Cookie chỉ có hiệu lực cho các route /admin*
             maxAge: expiresIn,
             secure: true,
             sameSite: 'strict'
@@ -113,7 +113,7 @@ export const adminLogin = async (req, res) => {
 
         res.cookie("adminCsrfToken", csrfToken, {
             httpOnly: false,
-            path: '/admin',
+            path: '/api/admin',
             maxAge: expiresIn,
             secure: true,
             sameSite: 'strict',
@@ -216,12 +216,21 @@ export const checkSession = async (req, res) => {
 
 
 export const logout = async (req, res) => {
-    res.clearCookie('userSession', { path: '/', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' })
-    res.clearCookie('adminSession', { path: '/admin', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' })
-    res.clearCookie('userCsrfToken', { path: '/', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' })
-    res.clearCookie('adminCsrfToken', { path: '/admin', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' })
-    es.clearCookie('connect.sid', { path: '/', httpOnly: true, sameSite: 'strict' })
-    return res.status(200).json({
-        message: 'Đăng xuất thành công'
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('Lỗi khi hủy session:', err)
+            return res.status(500).json({
+                message: 'Đã xảy ra lỗi khi đăng xuất'
+            })
+        }
+
+        res.clearCookie('userSession', { path: '/', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' })
+        res.clearCookie('adminSession', { path: '/admin', httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' })
+        res.clearCookie('userCsrfToken', { path: '/', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' })
+        res.clearCookie('adminCsrfToken', { path: '/admin', httpOnly: false, secure: process.env.NODE_ENV === 'production', sameSite: 'strict' })
+        res.clearCookie('connect.sid', { path: '/', httpOnly: true, sameSite: 'strict' })
+        return res.status(200).json({
+            message: 'Đăng xuất thành công'
+        })
     })
 }
