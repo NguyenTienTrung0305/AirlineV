@@ -8,8 +8,8 @@ const ADMIN_COLLECTION_NAME = "admins";
 const SESSION_COOKIE_USER = 'userSession'
 const CSRF_COOKIE_USER = 'userCsrfToken'
 
-const SESSION_COOKIE_ADMIN = 'userSession'
-const CSRF_COOKIE_ADMIN = 'userCsrfToken'
+const SESSION_COOKIE_ADMIN = 'adminSession'
+const CSRF_COOKIE_ADMIN = 'adminCsrfToken'
 
 export const verifySessionAndCSRF = async (req, res, next) => {
     const sessionCookie = req.cookies[SESSION_COOKIE_USER] || req.cookies[SESSION_COOKIE_ADMIN]

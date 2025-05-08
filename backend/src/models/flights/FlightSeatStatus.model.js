@@ -7,7 +7,7 @@ class SeatStatus {
 
         this.standardPrice = data.standardPrice
 
-        this.isAvailable = data.isAvailable;
+        this.isAvailable = data.isAvailable || true;
         this.isLocked = data.isLocked || false;
         this.lockedBy = data.lockedBy || null;
         this.lockExpiresAt = data.lockExpiresAt ? new Date(data.lockExpiresAt.seconds * 1000) : null;

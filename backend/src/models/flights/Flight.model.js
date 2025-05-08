@@ -26,8 +26,42 @@ class Flight {
         this.arrivalCode = arrivalCode;
         this.departureCity = departureCity;
         this.arrivalCity = arrivalCity;
-        this.departureTime = departureTime ? new Date(departureTime.seconds * 1000) : null;
-        this.arrivalTime = arrivalTime ? new Date(arrivalTime.seconds * 1000) : null;
+
+        if (departureTime) {
+            if (typeof departureTime === 'string') {
+                // Nếu là chuỗi ISO 8601 (từ client)
+                this.departureTime = new Date(departureTime);
+            } else if (departureTime.seconds) {
+                // Nếu là Timestamp từ Firestore
+                this.departureTime = new Date(departureTime.seconds * 1000);
+            } else {
+                throw new Error('Invalid departureTime format');
+            }
+        } else {
+            this.departureTime = null;
+        }
+
+        if (arrivalTime) {
+            if (typeof arrivalTime === 'string') {
+                // Nếu là chuỗi ISO 8601 (từ client)
+                this.arrivalTime = new Date(arrivalTime);
+            } else if (arrivalTime.seconds) {
+                // Nếu là Timestamp từ Firestore
+                this.arrivalTime = new Date(arrivalTime.seconds * 1000);
+            } else {
+                throw new Error('Invalid arrivalTime format');
+            }
+        } else {
+            this.arrivalTime = null;
+        }
+
+        // Kiểm tra tính hợp lệ của ngày
+        if (this.departureTime && isNaN(this.departureTime.getTime())) {
+            throw new Error('Invalid departureTime');
+        }
+        if (this.arrivalTime && isNaN(this.arrivalTime.getTime())) {
+            throw new Error('Invalid arrivalTime');
+        }
 
         this.status = status || "Landed";
     }
