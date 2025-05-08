@@ -13,12 +13,12 @@ app.use(cookieParser())
 // Khi một người dùng mới truy cập ứng dụng (hoặc phiên của họ hết hạn), express-session sẽ tạo một Session ID duy nhất cho họ dựa trên secret và bộ mã hóa
 // Nên kết nối với redis hoặc database trong môi trường production
 // Khác với Session Cookie (Cookie ở Frontend)
-// + Đây là một cookie HTTP được gửi từ server về trình duyệt (frontend) của người dùng
-// + Trong các request tiếp theo từ trình duyệt đó đến server, cookie này sẽ được tự động gửi đi trong header Cookie. 
-// Server (thông qua express-session middleware) sẽ sử dụng Session ID được gửi trong cookie này để xác định phiên của người dùng và truy 
-// cập dữ liệu phiên đã được lưu trữ ở backend
+    // + Đây là một cookie HTTP được gửi từ server về trình duyệt (frontend) của người dùng
+    // + Trong các request tiếp theo từ trình duyệt đó đến server, cookie này sẽ được tự động gửi đi trong header Cookie. 
+// Server (thông qua express-session middleware) sẽ sử dụng Session ID được gửi trong cookie được cấu hình trong express-session để xác định phiên của người dùng và truy 
+    // cập dữ liệu phiên đã được lưu trữ ở backend (req.sesison.user, req.sesison.role,...)
 app.use(session({
-    secret: 'secret',
+    secret: process.env.SECRET_KEY,
     resave: false,
     saveUninitialized: true,
     cookie: {
