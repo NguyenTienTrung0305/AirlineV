@@ -7,7 +7,7 @@ class SeatType {
         refundFee,
         checkedBaggage,
         carryOn,
-        service
+        service = []
     }) {
         this.typeCode = typeCode || 'economy-basic';
         this.seatName = seatName;
@@ -16,7 +16,7 @@ class SeatType {
         this.refundFee = refundFee;
         this.checkedBaggage = checkedBaggage;
         this.carryOn = carryOn;
-        this.service = service
+        this.service = service || []
     }
 
     toObject() {
