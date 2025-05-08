@@ -5,6 +5,8 @@ class SeatStatus {
         this.col = data.col;
         this.typeCode = data.typeCode;
 
+        this.standardPrice = data.standardPrice
+
         this.isAvailable = data.isAvailable;
         this.isLocked = data.isLocked || false;
         this.lockedBy = data.lockedBy || null;
@@ -20,7 +22,9 @@ class SeatStatus {
             seatCode: this.seatCode,
             row: this.row,
             col: this.col,
-            typeSeat: this.typeSeat,
+            typeCode: this.typeCode,
+            standardPrice: this.standardPrice,
+
             isAvailable: this.isAvailable,
             isLocked: this.isLocked,
             lockedBy: this.lockedBy,
