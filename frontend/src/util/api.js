@@ -22,16 +22,15 @@ const signupUserApi = (formData) => {
     return axios.post(BASE_URL_API, data)
 }
 
-const verifyTokenId = (tokenId) => {
-    const BASE_URL_API = '/api/verifyToken';
-    return axios.get(BASE_URL_API, {
-        headers: { Authorization: `Bearer ${tokenId}` }
-    })
+
+const createNewFlightApi = async (formData) => {
+    const response = await axios.post('/api/admin/flights/new', formData)
+    return response
 }
 
 export {
     loginUserApi,
     loginAdminApi,
     signupUserApi,
-    verifyTokenId
+    createNewFlightApi
 }
