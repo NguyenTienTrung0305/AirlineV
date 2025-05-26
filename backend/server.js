@@ -32,7 +32,9 @@ app.use(session({
 }))
 
 
-const allowedOrigins = ['http://localhost:3000'] // Chỉ cho phép origin của frontend
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000'] // Chỉ cho phép origin của frontend
 
 app.use(cors({
     origin: (origin, callback) => {
@@ -51,7 +53,9 @@ app.use(express.json())
 
 initWebRoutes(app)
 
-app.listen(config.port || 8080, () => {
-    console.log(`Server is live @ http://${config.host}:${config.port}`)
-})
+const port = process.env.PORT || 8080;
+const host = process.env.HOST || '0.0.0.0'
 
+app.listen(port, host, () => {
+  console.log(`Server running on http://${host}:${port}`)
+})
