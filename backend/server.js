@@ -44,6 +44,7 @@ app.use(cors({
             callback(new Error('Not allowed by CORS'))
         }
     },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true // Bắt buộc phải là true để cho phép gửi/nhận cookie
 }))
 
@@ -53,7 +54,7 @@ app.use(express.json())
 
 initWebRoutes(app)
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 8080
 const host = process.env.HOST || '0.0.0.0'
 
 app.listen(port, host, () => {
