@@ -30,6 +30,7 @@ export const AuthProvider = ({ children }) => {
     const router = useRouter()
 
     // Internal logout function (không redirect ngay)
+    // Dependancies = [] => logoutInternal không bao giờ được tạo lại
     const logoutInternal = useCallback(async () => {
         setUser(null)
         Cookies.remove('userSession', { path: '/' })
@@ -47,9 +48,23 @@ export const AuthProvider = ({ children }) => {
     }, [])
 
 
+    // useCallBack không tự gọi lại hàm, khi dependencies thay đổi nó chỉ tạo lại hàm chứ không gọi
+        // nếu muốn gọi lại hàm khi dependencies thay đổi thì sử dụng nó trong useEffect hoặc bạn tự gọi lại nó (onClick,...)
+    // VD:
+        // const fetchData = useCallback(() => {
+        //     console.log("Fetching data for ID:", id)
+        //     }, [id])
+
+        // useEffect(() => {
+        //     fetchData() // <- Hàm sẽ được gọi mỗi khi `id` thay đổi
+        //     }, [fetchData])
+        // Ở đây useEffect phụ thuộc vào fetchData, và fetchData phụ thuộc vào id
+        // Khi id thay đổi ⇒ fetchData thay đổi ⇒ useEffect chạy lại ⇒ fetchData được gọi lại
+    // Trong hàm này checkSession chỉ được tạo lại khi logoutInternal thay đổi
+        // Mà logoutInternal là hàm => do đó checkSession được tạo lại mỗi khi logoutInternal được tạo lại (thực thể mới)
     const checkSession = useCallback(async () => {
         try {
-            const res = await axios.get("/api/auth/session")
+            const res = await axios.get("/admin/auth/session")
             if (res.data.user) {
                 setUser(res.data.user)
             } else {
@@ -68,9 +83,9 @@ export const AuthProvider = ({ children }) => {
         }
     }, [logoutInternal])
 
-
+    // các hàm trong useEffect được gọi khi component được mount (reload hoặc dependance thay đổi)
     useEffect(() => {
-        checkSession() // Kiểm tra phiên ban đầu khi component mount
+        checkSession() // Kiểm tra phiên ban đầu khi component mount (reload hoặc dependance thay đổi)
 
         const intervalId = setInterval(checkSession, SESSION_CHECK_INTERVAL)
 
@@ -129,10 +144,12 @@ export const AuthProvider = ({ children }) => {
         }
     }
     // Kiểm tra xem người dùng có đăng nhập hay không
-    const isAuthenticated = !!user;
+    const isAuthenticated = !!user
 
     // Kiểm tra xem người dùng có phải là admin hay không
-    const isAdmin = user?.role === ROLES.ADMIN;
+    const isAdmin = user?.role === ROLES.ADMIN
+
+    const isUser = user?.role === ROLES.USER
 
     return (
         <AuthContext.Provider
@@ -141,9 +158,10 @@ export const AuthProvider = ({ children }) => {
                 loading,
                 isAuthenticated,
                 isAdmin,
+                isUser,
                 loginUser,
                 loginAdmin,
-                logout
+                logout,
             }}
         >
             {children}

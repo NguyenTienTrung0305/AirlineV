@@ -20,7 +20,7 @@ instance.interceptors.request.use(
                 let csrfToken = null
 
                 // Kiểm tra path để xác định cookie CSRF token
-                if (config.url.startsWith('/api/admin')) {
+                if (config.url.startsWith('/api/admin')) { // config.url => đường dẫn của request mà axios chuẩn bị gửi đến backend
                     csrfToken = Cookies.get('adminCsrfToken')
                 } else {
                     csrfToken = Cookies.get('userCsrfToken')
