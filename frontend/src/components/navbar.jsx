@@ -23,7 +23,7 @@ export default function NavBar() {
         setDropdown(!dropdown)
     }
 
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, isUser, logout } = useAuth();
 
     const handleLogout = () => {
         logout()
@@ -99,7 +99,7 @@ export default function NavBar() {
                         <button className="rounded-full bg-[#faf5ee] text-gray w-10 h-10 flex items-center justify-center hover:bg-orange hover:text-white">
                             <CiSearch size={20} />
                         </button>
-                        {isAuthenticated ? (
+                        {(isAuthenticated && isUser) ? (
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button variant="ghost" className="rounded-full bg-[#faf5ee] text-gray w-10 h-10 flex items-center justify-center hover:bg-orange hover:text-white p-0">
@@ -191,7 +191,7 @@ export default function NavBar() {
                                             Liên hệ
                                         </Link>
                                     </li>
-                                    {isAuthenticated ? (
+                                    {(isAuthenticated && isUser) ? (
                                         <>
                                             <li>
                                                 <Link
