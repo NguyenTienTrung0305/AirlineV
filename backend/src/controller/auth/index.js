@@ -3,11 +3,16 @@ import crypto from 'crypto'
 
 import { dbCreateUser, dbGetUserById } from "../../services/users/User.service.js"
 import { dbCreateAdmin, dbGetAdminById } from "../../services/users/Admin.service.js"
+import { getCache, userCache } from "../../cache/cache.js"
+
 
 const ROLES = {
     ADMIN: "admin",
     USER: "user",
 }
+
+const USER_COLLECTION_NAME = "users"
+const ADMIN_COLLECTION_NAME = "admins"
 
 const SESSION_EXPIRE_MS = 24 * 60 * 60 * 1000
 
@@ -48,14 +53,14 @@ export const userLogin = async (req, res) => {
 
         res.cookie("userSession", sessionCookies, {
             httpOnly: true, // cookie chỉ được truy cập từ phía server
-            path: '/', // cookie được gửi khi truy cập các url bắt đầu bằng "/" => tức là toàn bộ trang web
+            path: '/', // cookie được gửi khi truy cập các url bắt đầu bằng "/" (đường dẫn ở frontend) => tức là toàn bộ trang web
             maxAge: expiresIn,
             secure: true,
             sameSite: 'strict',
         })
 
         res.cookie("userCsrfToken", csrfToken, {
-            httpOnly: false, // cho phép frontend JavaScript đọc qua Cookies Header => để gửi csrfTokne trong request cho backend xác thực
+            httpOnly: false, // cho phép frontend JavaScript đọc qua document.cookie => để gửi csrfTokne trong request cho backend xác thực
             path: '/',
             maxAge: expiresIn,
             secure: true,
@@ -65,7 +70,6 @@ export const userLogin = async (req, res) => {
         // Success without CSRF
         return res.status(200).json({
             user: userData,
-            // csrfToken: csrfToken,
             message: "Đăng nhập thành công",
             code: "LOGIN_SUCCESS"
         })
@@ -105,7 +109,7 @@ export const adminLogin = async (req, res) => {
 
         res.cookie("adminSession", sessionCokies, {
             httpOnly: true,
-            path: "/api/admin", // Cookie chỉ có hiệu lực cho các route /admin*
+            path: "/admin", // Cookie chỉ có hiệu lực cho các route /admin* (đường dẫn ở frontend)
             maxAge: expiresIn,
             secure: true,
             sameSite: 'strict'
@@ -113,7 +117,7 @@ export const adminLogin = async (req, res) => {
 
         res.cookie("adminCsrfToken", csrfToken, {
             httpOnly: false,
-            path: '/api/admin',
+            path: '/admin',
             maxAge: expiresIn,
             secure: true,
             sameSite: 'strict',
@@ -121,7 +125,6 @@ export const adminLogin = async (req, res) => {
 
         return res.status(200).json({
             admin: adminData,
-            // csrfToken: csrfToken,
             message: "Đăng nhập Admin thành công",
             code: "ADMIN_LOGIN_SUCCESS"
         })
@@ -182,14 +185,53 @@ export const googleLogin = async (req, res) => {
     }
 }
 
+// export const checkSession = async (req, res) => {
+//     const userCookieSession = req.cookies.userSession
+//     const adminCookieSession = req.cookies.adminSession
+
+//     if (userCookieSession) {
+//         try {
+//             const decodedClaims = await admin.auth().verifySessionCookie(userCookieSession)
+//             return res.status(200).json({ user: req.session.user })
+//         } catch (error) {
+//             return res.status(401).json({
+//                 message: 'Phiên người dùng không hợp lệ',
+//                 code: 'INVALID_USER_SESSION'
+//             })
+//         }
+//     } else if (adminCookieSession) {
+//         try {
+//             const decodedClaims = await admin.auth().verifySessionCookie(adminCookieSession);
+//             return res.status(200).json({ user: req.session.admin })
+//         } catch (error) {
+//             return res.status(401).json({
+//                 message: 'Phiên admin không hợp lệ',
+//                 code: 'INVALID_ADMIN_SESSION'
+//             })
+//         }
+//     } else {
+//         return res.status(401).json({
+//             message: 'Không tìm thấy phiên',
+//             code: 'NO_SESSION_COOKIE'
+//         })
+//     }
+// }
+
 export const checkSession = async (req, res) => {
+
     const userCookieSession = req.cookies.userSession
     const adminCookieSession = req.cookies.adminSession
 
+    let userId
+    let role
+
     if (userCookieSession) {
+
         try {
             const decodedClaims = await admin.auth().verifySessionCookie(userCookieSession)
-            return res.status(200).json({ user: req.session.user })
+            userId = decodedClaims.uid
+            role = 'user'
+            req.session.csrfToken = req.cookies.userCsrfToken
         } catch (error) {
             return res.status(401).json({
                 message: 'Phiên người dùng không hợp lệ',
@@ -198,18 +240,49 @@ export const checkSession = async (req, res) => {
         }
     } else if (adminCookieSession) {
         try {
-            const decodedClaims = await admin.auth().verifySessionCookie(adminCookieSession);
-            return res.status(200).json({ user: req.session.admin })
+            const decodedClaims = await admin.auth().verifySessionCookie(adminCookieSession)
+            userId = decodedClaims.uid
+            role = 'admin'
+            req.session.csrfToken = req.cookies.adminCsrfToken
         } catch (error) {
             return res.status(401).json({
                 message: 'Phiên admin không hợp lệ',
                 code: 'INVALID_ADMIN_SESSION'
             })
         }
+    }
+
+    if (userId) {
+
+        let userData = getCache(userCache, userId)
+        if (!userData) {
+            const userCollectionName = role === 'admin' ? ADMIN_COLLECTION_NAME : USER_COLLECTION_NAME
+            const userDocRef = db.collection(userCollectionName).doc(userId)
+            const userDoc = await userDocRef.get()
+            if (userDoc.exists) {
+                userData = { uid: userId, ...userDoc.data() }
+                userCache.set(userId, userData)
+            }
+        }
+
+        if (userData) {
+            req.session.userId = userId
+            req.session.user = role === 'user' ? userData : undefined
+            req.session.admin = role === 'admin' ? userData : undefined
+            req.session.role = role
+            req.user = userData
+
+            return res.status(200).json({
+                message: 'Đăng nhập thành công',
+                user: userData,
+                role: role,
+                csrfToken: req.session.csrfToken
+            })
+        }
     } else {
         return res.status(401).json({
-            message: 'Không tìm thấy phiên',
-            code: 'NO_SESSION_COOKIE'
+            message: 'Phiên người dùng không hợp lệ',
+            code: 'INVALID_USER_SESSION'
         })
     }
 }
