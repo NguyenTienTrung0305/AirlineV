@@ -34,12 +34,12 @@ export function FlightHeader({ departureCode, arrivalCode, departureCity, arriva
                                 </span>
                             </div>
 
-                            <div className="text-sm flex flex-col items-center justify-center gap-2">
+                            <div className="text-sm flex flex-col items-start justify-center gap-2 font-semibold">
                                 <span>
-                                    {departureCity}
+                                   Departure: {departureCity}
                                 </span>
                                 <span>
-                                    {arrivalCity}
+                                    Arrival: {arrivalCity}
                                 </span>
                             </div>
                         </div>

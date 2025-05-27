@@ -44,13 +44,15 @@ export default function Dashboard() {
         return <div>Đang kiểm tra xác thực...</div> // Hiển thị loading state
     }
 
-    if (!isAuthenticated || !isAdmin) {
-        toast({
-            title: "Lỗi truy cập",
-            description: "Bạn không được phép truy cập vào trang này, vui lòng đăng nhập",
-            variant: "destructive"
-        })
-    }
+    useEffect(() => {
+        if (!loading && (!isAuthenticated || !isAdmin)) {
+            toast({
+                title: "Lỗi truy cập",
+                description: "Bạn không được phép truy cập vào trang này, vui lòng đăng nhập",
+                variant: "destructive"
+            })
+        }
+    }, [loading, isAuthenticated, isAdmin, toast])
 
     return (
         <div className=" lg:mx-auto pt-10 lg:pl-64 mx-0 pl-0 space-y-6">

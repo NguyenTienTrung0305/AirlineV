@@ -21,26 +21,30 @@ const SearchFlightForm = ({ onSearch }) => {
   const {
     fromAirport, setFromAirport,
     toAirport, setToAirport,
+
     departureDate, setDepartureDate,
     returnDate, setReturnDate,
+    
     tripType, setTripType,
     swapAirports,
     isValid,
-  } = useFlightSearch();
+  } = useFlightSearch()
 
   // handle click search
   const handleSearch = () => {
     if (!isValid) {
-      alert("Please fill in all required fields.");
-      return;
+      alert("Please fill in all required fields.")
+      return
     }
 
     // dữ liệu được mặc định đóng gói vào object data => rồi truyền qua onSearch bên FlightBookingTabs, onSeach này chính là handleSearch bên FlightBookingTabs
     onSearch({
       fromAirport,
       toAirport,
+
       departureDate: departureDate?.toISOString(),
       returnDate: tripType === 'roundTrip' ? returnDate?.toISOString() : null,
+
       tripType,
       passengerCount
     })
@@ -51,11 +55,11 @@ const SearchFlightForm = ({ onSearch }) => {
   const gridTemplate =
     tripType === "roundTrip"
       ? "lg:grid-cols-[1fr,auto,1fr,1fr,1fr,0.7fr]" // Vé khứ hồi có 6 cột
-      : "lg:grid-cols-[1fr,0.7fr,1fr,1fr,0.7fr]"; // Vé một chiều có 5 cột
+      : "lg:grid-cols-[1fr,0.7fr,1fr,1fr,0.7fr]" // Vé một chiều có 5 cột
 
 
-  const [adultCount, setAdultCount] = useState(1);
-  const [childCount, setChildCount] = useState(0);
+  const [adultCount, setAdultCount] = useState(1)
+  const [childCount, setChildCount] = useState(0)
   const passengerCount = adultCount + childCount;
 
 

@@ -5,12 +5,17 @@ import { FlightFilter } from "@/components/FlightComponent/FlightFilter"
 import { FlightSelectionNotice } from "@/components/FlightComponent/FlightSlectionNotice"
 import { useState, useEffect } from "react"
 import { SkeletonFlightCard } from "@/components/FlightComponent/FlightSkeleton"
-import flights from "@/data/flights.json"
+
+// import flights from "@/data/flights.json"
+
 import { FlightCard } from "@/components/FlightComponent/FlightCard"
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
+
+import { formatDate, useFlightData } from '@/hooks/useFlightData'
+import axios from "@/util/axiosCustom.js"
 
 
 export default function FlightBooking() {
@@ -20,28 +25,49 @@ export default function FlightBooking() {
     const {
         fromAirport,
         toAirport,
+
         departureDate,
         returnDate,
+
         tripType,
         passengerCount,
     } = router.query
+
+    const {
+        flights
+    } = useFlightData(fromAirport, toAirport, departureDate)
+
+    console.log(flights)
 
     useEffect(() => {
         AOS.init({
             duration: 1500,
             once: true
-        });
-    }, []);
+        })
+    }, [])
 
     return (
         <div>
             <FlightHeader
-                departureCode={fromAirport || "N/A"}
-                arrivalCode={toAirport || "N/A"}
-                departureCity={"Undefine"}
-                arrivalCity={"Undefine"}
-                departureDate={"N/A"}
-                returnDate={"N/A"}
+                departureCode={fromAirport?.split(" ")[0] || "N/A"}
+                arrivalCode={toAirport?.split(" ")[0] || "N/A"}
+
+                departureCity={(() => {
+                    const parts = fromAirport?.split(" ")
+                    return parts && parts.length >= 2
+                        ? parts.slice(1).join(" ")
+                        : "Undefine"
+                })()}
+                arrivalCity={(() => {
+                    const parts = toAirport?.split(" ")
+                    return parts && parts.length >= 2
+                        ? parts.slice(1).join(" ")
+                        : "Undefine"
+                })()}
+
+                departureDate={formatDate(new Date(departureDate)) || "N/A"}
+                returnDate={formatDate(new Date(returnDate)) || "N/A"}
+
                 passengers={`${passengerCount || 1} hành khách`}
                 data-aos="fade-up"
             />
