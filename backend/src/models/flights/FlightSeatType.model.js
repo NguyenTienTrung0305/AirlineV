@@ -9,8 +9,8 @@ class SeatType {
         carryOn,
         service = []
     }) {
-        this.typeCode = typeCode || 'economy-basic';
-        this.seatName = seatName;
+        this.typeCode = typeCode || 'EB';
+        this.seatName = seatName || "Economy Basic";
         this.price = price;
         this.changeFee = changeFee;
         this.refundFee = refundFee;

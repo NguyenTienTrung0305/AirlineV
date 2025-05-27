@@ -1,4 +1,4 @@
-import SeatStatus from "./FlightSeatStatus.model";
+import SeatStatus from "./FlightSeatStatus.model.js";
 
 class Flight {
     constructor({
@@ -8,8 +8,8 @@ class Flight {
 
         departureCode,
         arrivalCode,
-        departureTime,
-        arrivalTime,
+        departureTime, // Date Object
+        arrivalTime, // Date Object
         departureCity,
         arrivalCity,
 
@@ -28,14 +28,18 @@ class Flight {
         this.arrivalCity = arrivalCity;
 
         if (departureTime) {
+            // Nếu là ISO String
             if (typeof departureTime === 'string') {
-                // Nếu là chuỗi ISO 8601 (từ client)
                 this.departureTime = new Date(departureTime);
-            } else if (departureTime.seconds) {
-                // Nếu là Timestamp từ Firestore
+            } else if (departureTime instanceof Date && !isNaN(departureTime.getTime())) {
+                // Nếu đã là một Date object hợp lệ
+                this.departureTime = departureTime
+            }
+            // Nếu là dạng firestore timestamp
+            else if (departureTime.seconds) {
                 this.departureTime = new Date(departureTime.seconds * 1000);
             } else {
-                throw new Error('Invalid departureTime format');
+                throw new Error('Invalid departureTime format')
             }
         } else {
             this.departureTime = null;
@@ -43,27 +47,27 @@ class Flight {
 
         if (arrivalTime) {
             if (typeof arrivalTime === 'string') {
-                // Nếu là chuỗi ISO 8601 (từ client)
-                this.arrivalTime = new Date(arrivalTime);
-            } else if (arrivalTime.seconds) {
-                // Nếu là Timestamp từ Firestore
-                this.arrivalTime = new Date(arrivalTime.seconds * 1000);
+                this.arrivalTime = new Date(arrivalTime)
+            } else if (arrivalTime instanceof Date && !isNaN(arrivalTime.getTime())) {
+                this.arrivalTime = arrivalTime
+            }
+            else if (arrivalTime.seconds) {
+                this.arrivalTime = new Date(arrivalTime.seconds * 1000)
             } else {
-                throw new Error('Invalid arrivalTime format');
+                throw new Error('Invalid arrivalTime format')
             }
         } else {
-            this.arrivalTime = null;
+            this.arrivalTime = null
         }
 
-        // Kiểm tra tính hợp lệ của ngày
         if (this.departureTime && isNaN(this.departureTime.getTime())) {
-            throw new Error('Invalid departureTime');
+            throw new Error('Invalid departureTime')
         }
         if (this.arrivalTime && isNaN(this.arrivalTime.getTime())) {
-            throw new Error('Invalid arrivalTime');
+            throw new Error('Invalid arrivalTime')
         }
 
-        this.status = status || "Landed";
+        this.status = status || "Landed"
     }
 
     isDelayed() {
