@@ -19,8 +19,6 @@ import axios from "@/util/axiosCustom.js"
 
 
 export default function FlightBooking() {
-    const [isLoading, setIsLoading] = useState(false)
-
     const router = useRouter()
     const {
         fromAirport,
@@ -34,10 +32,10 @@ export default function FlightBooking() {
     } = router.query
 
     const {
-        flights
+        flights,
+        isLoading
     } = useFlightData(fromAirport, toAirport, departureDate)
 
-    console.log(flights)
 
     useEffect(() => {
         AOS.init({

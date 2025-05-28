@@ -1,5 +1,5 @@
 import { Card, CardContent } from "../ui/card";
-import { ChevronsRight, Info, Plane, RefreshCw, Luggage, Sofa } from "lucide-react";
+import { ChevronsRight, Info, Plane, RefreshCw, Luggage, Sofa, HandPlatter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogOverlay, DialogPortal } from "../ui/dialog";
 import { useState } from "react";
@@ -111,7 +111,7 @@ export function FlightCard({ flights }) {
                                     >
                                         <div>
                                             <div className="font-semibold">Phổ thông</div>
-                                            <div>{(flight.economyOptions[0]?.price + flight.standardPrice).toLocaleString()} VND</div>
+                                            <div>{(parseFloat(flight.economyOptions[0]?.price) + parseFloat(flight.standardPrice)).toLocaleString()} VND</div>
                                         </div>
                                         <span className="absolute -top-2 -right-2 bg-orange text-white text-xs px-1.5 py-0.5 rounded-full">
                                             Còn 36 ghế
@@ -122,7 +122,7 @@ export function FlightCard({ flights }) {
                                     >
                                         <div>
                                             <div className="font-semibold">Thương gia</div>
-                                            <div>{(flight.businessOptions[0]?.price + flight.standardPrice).toLocaleString()} VND</div>
+                                            <div>{(parseFloat(flight.businessOptions[0]?.price) + parseFloat(flight.standardPrice)).toLocaleString()} VND</div>
                                         </div>
                                     </Button>
                                 </div>
@@ -151,16 +151,16 @@ export function FlightCard({ flights }) {
                                             {/* departure and arrival */}
                                             <div className="flex items-center justify-between bg-gray-100 rounded-lg p-4">
                                                 <div className="flex flex-col items-center">
-                                                    <div className="text-3xl font-bold text-teal-700">{flight.departureTime}</div>
+                                                    <div className="text-3xl font-bold text-teal-700">{formatTime(flight.departureTime)}</div>
                                                     <div className="text-lg font-semibold">{flight.departureCode}</div>
                                                     <div className="text-sm text-gray-600">{flight.departureCity}</div>
                                                 </div>
                                                 <div className="flex flex-col items-center">
                                                     <Plane className="text-orange-500 mb-2" />
-                                                    <div className="text-sm font-medium">{flight.duration}</div>
+                                                    <div className="text-sm font-medium">{formatFlightDuration(flight.arrivalTime, flight.departureTime)}</div>
                                                 </div>
                                                 <div className="flex flex-col items-center">
-                                                    <div className="text-3xl font-bold text-teal-700">{flight.arrivalTime}</div>
+                                                    <div className="text-3xl font-bold text-teal-700">{formatTime(flight.arrivalTime)}</div>
                                                     <div className="text-lg font-semibold">{flight.arrivalCode}</div>
                                                     <div className="text-sm text-gray-600">{flight.arrivalCity}</div>
                                                 </div>
@@ -204,7 +204,7 @@ export function FlightCard({ flights }) {
                                             >
                                                 <div className="text-lg font-semibold mb-2">{option.name}</div>
                                                 <div className="text-xl font-bold text-teal-700 mb-4">
-                                                    {option.price.toLocaleString()} VND
+                                                    +{parseFloat(option.price).toLocaleString()} VND
                                                 </div>
                                                 <div className="space-y-3 text-sm">
                                                     <div className="flex items-start gap-2">
@@ -237,6 +237,17 @@ export function FlightCard({ flights }) {
                                                         <div>
                                                             <div className="font-medium">Hành lý xách tay</div>
                                                             <div className="text-gray-600">{option.carryOn}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-start gap-2">
+                                                        <HandPlatter className="h-4 w-4 mt-1" />
+                                                        <div>
+                                                            <div className="font-medium">Các dịch vụ</div>
+                                                            <ul className="text-gray-600 list-disc pl-5">
+                                                                {option.service.map((ele, index) => (
+                                                                    <li key={index}>{ele}</li>
+                                                                ))}
+                                                            </ul>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -286,7 +297,7 @@ export function FlightCard({ flights }) {
                                             {/* explane seat  */}
                                             <div className="grid gap-2 text-lg -mt-0.5 mx-auto">
                                                 <h1 htmlFor="bisiness">1A to {flight.startRowEco - 1}F</h1>
-                                                <h1 htmlFor="window">7A to 14A and 7F to 14F</h1>
+                                                <h1 htmlFor="window">7A to {flight.rows}A and 7{flight.nameCols[flight.nameCols.length -1]} to {flight.rows}{flight.nameCols[flight.nameCols.length -1]}</h1>
                                                 <h1 htmlFor="normal">Remains Seats</h1>
                                                 <h1 htmlFor="unselected">Unselected Seats</h1>
                                                 <h1 htmlFor="soldout">Soldout Seats</h1>
@@ -352,7 +363,7 @@ export function FlightCard({ flights }) {
                                                                     <Sofa
                                                                         key={index_}
                                                                         className={`w-7 h-7 min-h-[1.8rem]
-                                                                            ${selectedSeats.includes(`${seat.col}-${rowNumber}`)
+                                                                            ${selectedSeats.includes(`${seat.col}${rowNumber}`)
                                                                                 ? 'text-orange'
                                                                                 : 'text-teal-700'
                                                                             }
@@ -397,15 +408,15 @@ export function FlightCard({ flights }) {
                                                                     />
                                                                 ) : (
                                                                     <Sofa
-                                                                        key={adjustedIndex}
+                                                                        key={index_}
                                                                         className={`w-7 h-7 min-h-[1.8rem] ${expandedClass === 'Business'
                                                                             ? 'cursor-not-allowed'
                                                                             : 'cursor-pointer hover:scale-125'
-                                                                            } ${selectedSeats.includes(`${seat.col}-${rowNumber}`) &&
+                                                                            } ${selectedSeats.includes(`${seat.col}${rowNumber}`) &&
                                                                                 (seat.col === 'A' || seat.col === 'F') &&
                                                                                 rowNumber >= 7
                                                                                 ? 'text-blue-700'
-                                                                                : selectedSeats.includes(`${seat.col}-${rowNumber}`)
+                                                                                : selectedSeats.includes(`${seat.col}${rowNumber}`)
                                                                                     ? 'text-[#35AB58]'
                                                                                     : 'text-teal-700'
                                                                             }`}

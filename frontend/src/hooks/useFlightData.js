@@ -39,6 +39,74 @@ export function formatDate(date) {
  * Chuyển dữ liệu API sang định dạng cần thiết 
  * Tách ra ngoài để không bị re-create mỗi lần render 
  */
+/**
+ {
+  "message": "Flights suggesion successfully",
+  "code": "FLIGHT_SUGGESION_SUCCESS",
+  "data": [
+    "flights": [
+        "flight": {
+            "flightId": string, // e.g., "HANVN123-250508"
+            "flightCode": string, // e.g., "VN123"
+            "aircraftType": string, // e.g., "Boeing 787"
+            "departureCode": string, // e.g., "HAN"
+            "arrivalCode": string, // e.g., "SGN"
+            "departureTime": string, // ISO string, e.g., "2025-05-08T10:15:00.000Z"
+            "arrivalTime": string, // ISO string, e.g., "2025-05-08T12:15:00.000Z"
+            "departureCity": string, // e.g., "Hà Nội"
+            "arrivalCity": string, // e.g., "Hồ Chí Minh"
+            "status": string // e.g., "OnTime"
+        },
+        "rows": number, // e.g., 13
+        "cols": number, // e.g., 6
+        "seatType": string[], // e.g., ["Business", "Economy"]
+        "startRowBus": number, // e.g., 1
+        "startRowEco": number, // e.g., 5
+        "standardPrice": number, // e.g., 1500000
+        "seats": [
+            {
+            "flightId": string, // e.g., "HANVN123-250508"
+            "seatCode": string, // e.g., "A1"
+            "row": number, // e.g., 1
+            "col": string, // e.g., "A"
+            "typeCode": string, // e.g., "Business" or "Economy"
+            "standardPrice": number, // e.g., 1500000
+            "isAvailable": boolean, // e.g., true
+            "isLocked": boolean, // e.g., false
+            "lockedBy": null | string, // e.g., null
+            "lockExpiresAt": null | string, // ISO string if locked
+            "lockedAt": null | string, // ISO string if locked
+            "soldTo": null | string, // e.g., null
+            "soldAt": null | string // ISO string if sold
+            },
+            // ... more seat objects
+        ]
+    ],
+    "seatTypes": [
+        {
+            "typeCode": "Business",
+            "seatName": "Thương gia cổ điển",
+            "price": 1500000,
+            "changeFee": 200000,
+            "refundFee": 500000,
+            "checkedBaggage": 30,
+            "carryOn": 10,
+            "service": ["Ưu tiên check-in", "Đồ uống miễn phí"]
+        },
+        {
+            "typeCode": "Economy",
+            "seatName": "Phổ thông",
+            "price": 500000,
+            "changeFee": 100000,
+            "refundFee": 200000,
+            "checkedBaggage": 20,
+            "carryOn": 7,
+            "service": ["Bữa ăn nhẹ"]
+        }
+    ]
+  ]
+}
+ */
 function transformFlight(data, from, to) {
     return data.flights.map((item) => {
         const flight = item.flight
@@ -89,8 +157,8 @@ function transformFlight(data, from, to) {
 
             seatCol.push({
                 col,
-                rowBusiness: businessSeats,
-                rowNormal: normalSeats,
+                rowBusiness: businessSeats, // số lượng hàng ghế thương gia
+                rowNormal: normalSeats, // số lượng hàng ghế phổ thông
                 missBusiness: 0, 
                 missNormal: 0,
             })
@@ -99,8 +167,8 @@ function transformFlight(data, from, to) {
         // Thêm cột số thứ tự hàng (không có ghế)
         seatCol.push({
             col: "",
-            rowBusiness: item.startRowEco - 1,
-            rowNormal: item.rows - item.startRowEco + 1,
+            rowBusiness: item.startRowEco - 1, // số lượng hàng ghế thương gia
+            rowNormal: item.rows - item.startRowEco + 1, // số lượng hàng ghế phổ thông
             missBusiness: 0,
             missNormal: 0,
         });
@@ -118,6 +186,7 @@ function transformFlight(data, from, to) {
             status: flight.status,
             rows: item.rows,
             cols: item.cols,
+            nameCols: cols,
             startRowBus: item.startRowBus,
             startRowEco: item.startRowEco,
             standardPrice: item.standardPrice,
@@ -133,7 +202,7 @@ function transformFlight(data, from, to) {
 export const useFlightData = (departureCity, arrivalCity, flightDate) => {
     const [flights, setFlights] = useState([]);
     const [error, setError] = useState(null)
-    const [loading, setLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     const initialFetchDoneRef = useRef(false)
 
@@ -151,7 +220,7 @@ export const useFlightData = (departureCity, arrivalCity, flightDate) => {
         } catch (error) {
             setError(error.message)
         } finally {
-            setLoading(false)
+            setIsLoading(false)
         }
     }, [setError])
 
@@ -168,7 +237,7 @@ export const useFlightData = (departureCity, arrivalCity, flightDate) => {
         } catch (error) {
             setError(error.message)
         } finally {
-            setLoading(false)
+            setIsLoading(false)
         }
     }, [setError])
 
@@ -177,13 +246,13 @@ export const useFlightData = (departureCity, arrivalCity, flightDate) => {
             if (initialFetchDoneRef.current) return // tránh gọi lại lần 2 do Strict Mode
             initialFetchDoneRef.current = true
 
-            setLoading(true)
+            setIsLoading(true)
             if (departureCity && arrivalCity && flightDate) {
                 await fetchFlights(departureCity, arrivalCity, flightDate, setFlights)
             } else {
                 await fetchSuggessionFlight(setFlights)
             }
-            setLoading(false)
+            setIsLoading(false)
         }
 
         loadFlights()
@@ -191,7 +260,7 @@ export const useFlightData = (departureCity, arrivalCity, flightDate) => {
 
     return {
         flights,
-        loading
+        isLoading
     }
 }
 
