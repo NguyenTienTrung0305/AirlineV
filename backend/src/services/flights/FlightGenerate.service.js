@@ -127,7 +127,12 @@ const generateMockFlight = (departureCode, arrivalCode) => {
 
 
 const generateMockFlights = (departureCity, arrivalCity) => {
-    const numFlights = getRandom(1, 1)
+    if (departureCity.length > 1 || arrivalCity.length > 1) {
+        departureCity = departureCity.split(" ")[0]
+        arrivalCity = arrivalCity.split(" ")[0]
+    }
+    console.log(departureCity + " " + arrivalCity)
+    const numFlights = getRandom(1, 3)
     const flights = []
     for (let i = 0; i < numFlights; i++) {
         flights.push(generateMockFlight(departureCity, arrivalCity))
@@ -140,7 +145,7 @@ const generateFlightsSuggestion = () => {
     const flightCode = Object.keys(airports)
     const suggestion = []
 
-    const numSuggestion = getRandom(1,1)
+    const numSuggestion = getRandom(1, 3)
     for (let i = 1; i <= numSuggestion; i++) {
         const departureCity = flightCode[getRandom(0, flightCode.length - 1)]
         let arrivalCity
