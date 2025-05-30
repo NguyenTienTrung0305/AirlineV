@@ -231,8 +231,9 @@ export async function dbLockSeat(flightId, seatCode, userId, durationMs) {
             })
 
             console.log(`Ghế ${seatCode} đã được khóa tạm thời cho người dùng ${userId} trên chuyến bay ${flightId}.`)
-            return true
         })
+
+        return true
     } catch (error) {
         console.error(`Lỗi khi khóa ghế ${seatCode} trên chuyến bay ${flightId}:`, error)
         return false
@@ -264,6 +265,38 @@ export const dbUnlockExpireSeat = async (flightId) => {
 
     } catch (error) {
         console.error(`Lỗi khi mở khóa ghế hết hạn trên chuyến bay ${flightId}:`, error)
+        return false
+    }
+}
+
+export const dbUnlockSeat = async (flightId, seatCode, userId) => {
+    try {
+        const seatDocRef = db.collection('flights').doc(flightId).collection('seats').doc(seatCode)
+        await db.runTransaction(async (transaction) => {
+            const seatDoc = await transaction.get(seatDocRef)
+            if (!seatDoc.exists) {
+                throw "Ghế không tồn tại"
+            }
+            const seatData = seatDoc.data()
+            if (!seatData.isLocked) {
+                throw "Ghế không bị khóa"
+            }
+
+            if (seatData.lockedBy !== userId) {
+                throw new Error("Bạn không có quyền mở khóa ghế này")
+            }
+
+            transaction.update(seatDocRef, {
+                isLocked: false,
+                lockedBy: null,
+                lockedAt: null,
+                lockExpiresAt: null
+            })
+        })
+
+        return true
+    } catch (error) {
+        console.error(`Lỗi khi mở khóa ghế ${seatCode} trên chuyến bay ${flightId}:`, error)
         return false
     }
 }

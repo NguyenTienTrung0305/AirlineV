@@ -1,6 +1,6 @@
 import { setCache } from "../../cache/cache.js"
 import SeatType from "../../models/flights/FlightSeatType.model.js"
-import { dbCreateFlight, dbCreateTypeSeats, dbGetTypeSeat, dbLockSeat, dbGetFlightSeats, dbGetAllTypeSeats } from "../../services/flights/Flight.service.js"
+import { dbCreateFlight, dbCreateTypeSeats, dbGetTypeSeat, dbLockSeat, dbGetFlightSeats, dbGetAllTypeSeats, dbUnlockExpireSeat, dbUnlockSeat } from "../../services/flights/Flight.service.js"
 import { generateFlightsSuggestion, generateMockFlights } from "../../services/flights/FlightGenerate.service.js"
 
 export const createTypeSeats = async (req, res) => {
@@ -206,17 +206,80 @@ export const lockSeat = async (req, res) => {
             return res.status(200).json({
                 message: 'Ghế đã được khóa thành công',
                 code: 'LOCK_SEAT_SUCCESS',
-            });
+            })
         } else {
             return res.status(400).json({
                 message: 'Không thể khóa ghế',
                 code: 'LOCK_SEAT_FAILED',
-            });
+            })
         }
     } catch (error) {
         return res.status(500).json({
             message: 'Lỗi máy chủ nội bộ',
             code: 'INTERNAL_SERVER_ERROR',
+            error: error.message,
+        })
+    }
+}
+
+
+export const unlockExpireSeat = async (req, res) => {
+    try {
+        const { flightId } = req.body
+        if (!flightId) {
+            return res.status(400).json({
+                message: 'Thiếu flightId',
+                code: 'MISSING_REQUIRED_FIELDS',
+            })
+        } else {
+            const success = await dbUnlockExpireSeat(flightId)
+            if (success) {
+                return res.status(200).json({
+                    message: 'Ghế đã được mở thành công',
+                    code: 'UNLOCK_SEAT_SUCCESS',
+                })
+            } else {
+                return res.status(400).json({
+                    message: 'Không thể mở khóa ghế',
+                    code: 'UNLOCK_SEAT_FAILED',
+                })
+            }
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Lỗi máy chủ nội bộ',
+            code: 'INTERNAL_SERVER_ERROR',
+            error: error.message,
+        })
+    }
+}
+
+export const unlockSeat = async (req, res) => {
+    try {
+        const { flightId, seatCode, userId } = req.body
+        if (!flightId || !seatCode || !userId) {
+            return res.status(400).json({
+                message: "Mising field requirement",
+                code: "MISSING_REQUIRED_FIELDS",
+            })
+        }
+
+        const success = await dbUnlockSeat(flightId, seatCode, userId)
+        if (success) {
+            return res.status(200).json({
+                message: "Seat unlocked successfully",
+                code: "UNLOCK_SEAT_SUCCESS",
+            })
+        } else {
+            return res.status(400).json({
+                message: "Failed to unlock seat",
+                code: "UNLOCK_SEAT_FAILED",
+            })
+        }
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error",
+            code: "INTERNAL_SERVER_ERROR",
             error: error.message,
         })
     }

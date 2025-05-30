@@ -107,8 +107,8 @@ const generateMockFlight = (departureCode, arrivalCode) => {
     })
 
     // rows, cols, seatTypes, startRowBus, startRowEco, standardPrice
-    const rows = getRandom(13, 14)
-    const cols = getRandom(6, 8)
+    const rows = getRandom(12, 14)
+    const cols = getRandom(5, 7)
     const seatType = ["Business", "Economy"]
     const startRowBus = 1
     const startRowEco = Math.floor(rows / 3)
