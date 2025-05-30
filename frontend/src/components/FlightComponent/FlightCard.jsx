@@ -38,33 +38,53 @@ export function FlightCard({ flights }) {
                 s.seatCode === seatIdentifier &&
                 (expandedClass === "Economy" ? s.typeCode.startsWith("E") : s.typeCode.startsWith("B")) // Nếu là hạng economy thì chỉ tìm ghế bắt đầu bằng "E"
         )
-        if (!seat || !seat.isAvailable || seat.isLocked || seat.soldTo) {
-            return // Ghế không khả dụng, bị khóa, hoặc đã bán
-        }
+        // if ((!seat || !seat.isAvailable || seat.isLocked || seat.soldTo) && seat.soldTo !== "user123") {
+        //     return // Ghế không khả dụng, bị khóa, hoặc đã bán
+        // }
 
-        setLoadingSeats((prev) => ({ ...prev, [seatIdentifier]: true })) // hiển thị trạng thái loading
 
-        try {
-            const response = await axios.post("/api/flights/lock-seat", {
-                flightId,
-                seatCode: seatIdentifier,
-                userId: "user123",
-                durationMs: 10 * 60 * 1000,
-            })
+        console.log(seat)
 
-            if (response.status === 200) {
-                setSelectedSeats((prev) => {
-                    if (prev.includes(seatIdentifier)) {
-                        return prev.filter((seat) => seat !== seatIdentifier)
-                    } else {
-                        return [...prev, seatIdentifier]
-                    }
+        if (selectedSeats.includes(seatIdentifier)) {
+            // Bỏ chọn ghế và mở khóa ghế
+            setLoadingSeats((prev) => ({ ...prev, [seatIdentifier]: true })) // hiển thị trạng thái loading
+            try {
+                const response = await axios.post('/api/flights/unlock-seat', {
+                    flightId,
+                    seatCode: seatIdentifier,
+                    userId: "user123"
                 })
+
+                if (response.status === 200) {
+                    setSelectedSeats((prev) => prev.filter((seat) => seat !== seatIdentifier))
+                }
+            } catch (error) {
+                console.log("Lỗi khi mở khóa ghế", error)
+            } finally {
+                setLoadingSeats((prev) => ({ ...prev, [seatIdentifier]: false }))
             }
-        } catch (error) {
-            console.error("Lỗi khi khóa ghế:", error)
-        } finally {
-            setLoadingSeats((prev) => ({ ...prev, [seatIdentifier]: false }))
+            return;
+        } else {
+            // Khóa ghế nếu chưa được chọn
+            setLoadingSeats((prev) => ({ ...prev, [seatIdentifier]: true }))
+            try {
+                const response = await axios.post("/api/flights/lock-seat", {
+                    flightId,
+                    seatCode: seatIdentifier,
+                    userId: "user123",
+                    durationMs: 10 * 60 * 1000,
+                })
+
+                if (response.status === 200) {
+                    setSelectedSeats((prev) => {
+                        setSelectedSeats((prev) => [...prev, seatIdentifier])
+                    })
+                }
+            } catch (error) {
+                console.error("Lỗi khi khóa ghế:", error)
+            } finally {
+                setLoadingSeats((prev) => ({ ...prev, [seatIdentifier]: false }))
+            }
         }
     }
 
@@ -297,7 +317,7 @@ export function FlightCard({ flights }) {
                                             {/* explane seat  */}
                                             <div className="grid gap-2 text-lg -mt-0.5 mx-auto">
                                                 <h1 htmlFor="bisiness">1A to {flight.startRowEco - 1}F</h1>
-                                                <h1 htmlFor="window">7A to {flight.rows}A and 7{flight.nameCols[flight.nameCols.length -1]} to {flight.rows}{flight.nameCols[flight.nameCols.length -1]}</h1>
+                                                <h1 htmlFor="window">7A to {flight.rows}A and 7{flight.nameCols[flight.nameCols.length - 1]} to {flight.rows}{flight.nameCols[flight.nameCols.length - 1]}</h1>
                                                 <h1 htmlFor="normal">Remains Seats</h1>
                                                 <h1 htmlFor="unselected">Unselected Seats</h1>
                                                 <h1 htmlFor="soldout">Soldout Seats</h1>
