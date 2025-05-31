@@ -7,6 +7,28 @@ import initWebRoutes from './src/routes/index.js'
 
 const app = express()
 
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000'] // Chỉ cho phép origin của frontend
+
+app.use(cors({
+    origin: (origin, callback) => {
+
+        console.log('DEBUG (server.js): Incoming Request Origin:', origin)
+
+        // Kiểm tra nếu origin không có (vd: server-to-server, Postman không set Origin header)
+        // HOẶC nếu origin nằm trong danh sách cho phép
+        if (allowedOrigins.includes(origin) || !origin) { // Thêm !origin để cho phép các request không có origin (ví dụ: từ server-side)
+            callback(null, true);
+        } else {
+            console.error('DEBUG (server.js): CORS Rejected - Origin mismatch. Incoming:', origin, 'Allowed:', allowedOrigins);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true // Bắt buộc phải là true để cho phép gửi/nhận cookie
+}))
+
 app.use(cookieParser())
 
 // Quản lý phiên người dùng ở phía server. Nó cung cấp các cơ chế để tạo, lưu trữ và truy xuất dữ liệu phiên liên quan đến từng người dùng
@@ -30,30 +52,6 @@ app.use(session({
     },
     // store 
 }))
-
-
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
-  : ['http://localhost:3000'] // Chỉ cho phép origin của frontend
-
-app.use(cors({
-    origin: (origin, callback) => {
-
-        console.log('DEBUG (server.js): Incoming Request Origin:', origin)
-
-        // Kiểm tra nếu origin không có (vd: server-to-server, Postman không set Origin header)
-        // HOẶC nếu origin nằm trong danh sách cho phép
-        if (allowedOrigins.includes(origin) || !origin) { // Thêm !origin để cho phép các request không có origin (ví dụ: từ server-side)
-            callback(null, true);
-        } else {
-            console.error('DEBUG (server.js): CORS Rejected - Origin mismatch. Incoming:', origin, 'Allowed:', allowedOrigins);
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true // Bắt buộc phải là true để cho phép gửi/nhận cookie
-}))
-
 
 
 app.use(express.json())
