@@ -22,8 +22,10 @@ const {
 } = process.env;
 
 // Kiểm tra biến xem đã có chưa
-assert(PORT, "Port is required");
-assert(HOST, "Host is required");
+if (NODE_ENV === 'development') {
+    assert(PORT, "Port is required in development environment")
+    assert(HOST, "Host is required in development environment")
+}
 
 export default {
     port: PORT,
