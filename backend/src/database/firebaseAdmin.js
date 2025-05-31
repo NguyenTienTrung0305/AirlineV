@@ -9,8 +9,9 @@ import admin from 'firebase-admin'
 
 // File serviceAccountKey.json là "chìa khóa" riêng tư dành cho server của bạn để sử dụng Firebase Admin SDK. 
 // Nó là một dạng Google Service Account Key dùng để xác thực backend với Firebase
-import serviceAccount from '../../serviceAccountKey.json' with { type: 'json' };
+// import serviceAccount from '../../serviceAccountKey.json' with { type: 'json' };
 
+const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
 
 // singleton
 // Chỉ khởi tạo nếu chưa có ứng dụng nào được tạo
