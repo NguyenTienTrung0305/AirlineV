@@ -2,35 +2,58 @@ import { Card, CardContent } from "../ui/card";
 import { ChevronsRight, Info, Plane, RefreshCw, Luggage, Sofa, HandPlatter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, DialogTrigger, DialogOverlay, DialogPortal } from "../ui/dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BsFillAirplaneEnginesFill } from "react-icons/bs";
 import { useRouter } from "next/router";
 import { formatFlightDuration, formatTime, formatDate } from "@/hooks/useFlightData";
 import axios from "@/util/axiosCustom";
 
+import { useAuth } from "@/auth/auth.js"
 
 
 export function FlightCard({ flights }) {
+
+    const router = useRouter()
+
     const [expandedFlight, setExpandedFlight] = useState(null)
     const [expandedClass, setExpandedClass] = useState(null)
     const [selectedOptionId, setSelectedOptionId] = useState(null)
 
-    const [selectedSeats, setSelectedSeats] = useState([])
+    const [selectedSeats, setSelectedSeats] = useState({})
 
     const [loadingSeats, setLoadingSeats] = useState({})
 
+    const { isAuthenticated, isUser, user } = useAuth()
+
+    useEffect(() => {
+        if (!isAuthenticated && selectedOptionId) {
+            setSelectedOptionId(null)
+            router.push("/login")
+        }
+    }, [isAuthenticated, selectedOptionId, router]);
+
     const handleExpanded = (flightId, classType) => {
-        setSelectedOptionId(null);
+        if (!isAuthenticated) {
+            router.push("/login")
+            return
+        }
+
+        setSelectedOptionId(null)
         if (expandedFlight === flightId && expandedClass === classType) {
-            setExpandedFlight(null);
-            setExpandedClass(null);
+            setExpandedFlight(null)
+            setExpandedClass(null)
         } else {
-            setExpandedFlight(flightId);
-            setExpandedClass(classType);
+            setExpandedFlight(flightId)
+            setExpandedClass(classType)
         }
     };
 
     const handleSeatClick = async (flightId, col, row) => {
+        if (!isAuthenticated) {
+            router.push("/login")
+            return
+        }
+
         const seatIdentifier = `${col}${row}`
         const flight = flights.find((f) => f.flightId === flightId)
         const seat = flight.seats.find(
@@ -38,25 +61,28 @@ export function FlightCard({ flights }) {
                 s.seatCode === seatIdentifier &&
                 (expandedClass === "Economy" ? s.typeCode.startsWith("E") : s.typeCode.startsWith("B")) // Nếu là hạng economy thì chỉ tìm ghế bắt đầu bằng "E"
         )
-        // if ((!seat || !seat.isAvailable || seat.isLocked || seat.soldTo) && seat.soldTo !== "user123") {
-        //     return // Ghế không khả dụng, bị khóa, hoặc đã bán
-        // }
+        if ((!seat || !seat.isAvailable || seat.isLocked || seat.soldTo) && seat.lockedBy !== user.uid) {
+            return // Ghế không khả dụng, bị khóa, hoặc đã bán
+        }
 
-
-        console.log(seat)
-
-        if (selectedSeats.includes(seatIdentifier)) {
+        if (selectedSeats[flightId]?.includes(seatIdentifier)) {
             // Bỏ chọn ghế và mở khóa ghế
             setLoadingSeats((prev) => ({ ...prev, [seatIdentifier]: true })) // hiển thị trạng thái loading
             try {
                 const response = await axios.post('/api/flights/unlock-seat', {
                     flightId,
                     seatCode: seatIdentifier,
-                    userId: "user123"
+                    userId: user.uid
                 })
 
                 if (response.status === 200) {
-                    setSelectedSeats((prev) => prev.filter((seat) => seat !== seatIdentifier))
+                    setSelectedSeats((prev) => {
+                        const seats = prev[flightId] || []
+                        return {
+                            ...prev,
+                            [flightId]: seats.filter((seat) => seat !== seatIdentifier),
+                        }
+                    })
                 }
             } catch (error) {
                 console.log("Lỗi khi mở khóa ghế", error)
@@ -71,13 +97,17 @@ export function FlightCard({ flights }) {
                 const response = await axios.post("/api/flights/lock-seat", {
                     flightId,
                     seatCode: seatIdentifier,
-                    userId: "user123",
+                    userId: user.uid,
                     durationMs: 10 * 60 * 1000,
                 })
 
                 if (response.status === 200) {
                     setSelectedSeats((prev) => {
-                        setSelectedSeats((prev) => [...prev, seatIdentifier])
+                        const seats = prev[flightId] || []
+                        return {
+                            ...prev,
+                            [flightId]: [...seats, seatIdentifier]
+                        }
                     })
                 }
             } catch (error) {
@@ -209,74 +239,75 @@ export function FlightCard({ flights }) {
 
 
                             {/* Xử lý sự kiện khi nhấn nút price */}
-                            {expandedFlight === flight.flightId && ["Economy", "Business"].includes(expandedClass) && (
-                                <div className="mt-4 border-t border-teal-400">
-                                    <h3 className="font-semibold my-4">Chọn giá vé</h3>
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        {(expandedClass === "Economy" ? flight.economyOptions : flight.businessOptions).map((option, optionIndex) => (
-                                            <div key={optionIndex}
-                                                className={`border border-teal-500 rounded-lg p-4 relative cursor-pointer transition-all 
+                            {isAuthenticated && isUser && expandedFlight === flight.flightId && ["Economy", "Business"].includes(expandedClass)
+                                && (
+                                    <div className="mt-4 border-t border-teal-400">
+                                        <h3 className="font-semibold my-4">Chọn giá vé</h3>
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            {(expandedClass === "Economy" ? flight.economyOptions : flight.businessOptions).map((option, optionIndex) => (
+                                                <div key={optionIndex}
+                                                    className={`border border-teal-500 rounded-lg p-4 relative cursor-pointer transition-all 
                                                     ${selectedOptionId === option.id
-                                                        ? "ring-2 ring-teal-500 bg-teal-50"
-                                                        : "border-teal-500"
-                                                    }`}
-                                                onClick={() => setSelectedOptionId(option.id)}
-                                            >
-                                                <div className="text-lg font-semibold mb-2">{option.name}</div>
-                                                <div className="text-xl font-bold text-teal-700 mb-4">
-                                                    +{parseFloat(option.price).toLocaleString()} VND
-                                                </div>
-                                                <div className="space-y-3 text-sm">
-                                                    <div className="flex items-start gap-2">
-                                                        <RefreshCw className="h-4 w-4 mt-1" />
-                                                        <div>
-                                                            <div className="font-medium">Thay đổi vé</div>
-                                                            <div className="text-gray-600">
-                                                                Phí đổi vé tối đa {option.changeFee.toLocaleString()} VND mỗi hành khách
+                                                            ? "ring-2 ring-teal-500 bg-teal-50"
+                                                            : "border-teal-500"
+                                                        }`}
+                                                    onClick={() => setSelectedOptionId(option.id)}
+                                                >
+                                                    <div className="text-lg font-semibold mb-2">{option.name}</div>
+                                                    <div className="text-xl font-bold text-teal-700 mb-4">
+                                                        +{parseFloat(option.price).toLocaleString()} VND
+                                                    </div>
+                                                    <div className="space-y-3 text-sm">
+                                                        <div className="flex items-start gap-2">
+                                                            <RefreshCw className="h-4 w-4 mt-1" />
+                                                            <div>
+                                                                <div className="font-medium">Thay đổi vé</div>
+                                                                <div className="text-gray-600">
+                                                                    Phí đổi vé tối đa {option.changeFee.toLocaleString()} VND mỗi hành khách
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-start gap-2">
+                                                            <RefreshCw className="h-4 w-4 mt-1" />
+                                                            <div>
+                                                                <div className="font-medium">Hoàn vé</div>
+                                                                <div className="text-gray-600">
+                                                                    Phí hoàn vé tối đa {option.refundFee.toLocaleString()} VND mỗi hành khách
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-start gap-2">
+                                                            <Luggage className="h-4 w-4 mt-1" />
+                                                            <div>
+                                                                <div className="font-medium">Hành lý ký gửi</div>
+                                                                <div className="text-gray-600">{option.checkedBaggage}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-start gap-2">
+                                                            <Luggage className="h-4 w-4 mt-1" />
+                                                            <div>
+                                                                <div className="font-medium">Hành lý xách tay</div>
+                                                                <div className="text-gray-600">{option.carryOn}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-start gap-2">
+                                                            <HandPlatter className="h-4 w-4 mt-1" />
+                                                            <div>
+                                                                <div className="font-medium">Các dịch vụ</div>
+                                                                <ul className="text-gray-600 list-disc pl-5">
+                                                                    {option.service.map((ele, index) => (
+                                                                        <li key={index}>{ele}</li>
+                                                                    ))}
+                                                                </ul>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <RefreshCw className="h-4 w-4 mt-1" />
-                                                        <div>
-                                                            <div className="font-medium">Hoàn vé</div>
-                                                            <div className="text-gray-600">
-                                                                Phí hoàn vé tối đa {option.refundFee.toLocaleString()} VND mỗi hành khách
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <Luggage className="h-4 w-4 mt-1" />
-                                                        <div>
-                                                            <div className="font-medium">Hành lý ký gửi</div>
-                                                            <div className="text-gray-600">{option.checkedBaggage}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <Luggage className="h-4 w-4 mt-1" />
-                                                        <div>
-                                                            <div className="font-medium">Hành lý xách tay</div>
-                                                            <div className="text-gray-600">{option.carryOn}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-start gap-2">
-                                                        <HandPlatter className="h-4 w-4 mt-1" />
-                                                        <div>
-                                                            <div className="font-medium">Các dịch vụ</div>
-                                                            <ul className="text-gray-600 list-disc pl-5">
-                                                                {option.service.map((ele, index) => (
-                                                                    <li key={index}>{ele}</li>
-                                                                ))}
-                                                            </ul>
-                                                        </div>
-                                                    </div>
                                                 </div>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-
+                                )
+                            }
 
                             {/* xử lý sự kiện chọn vé */}
                             {selectedOptionId && expandedFlight === flight.flightId && (
@@ -328,10 +359,10 @@ export function FlightCard({ flights }) {
                                         {/* Thanh toán */}
                                         <div className="flex flex-col gap-y-4 max-h-[200px] overflow-y-auto">
                                             <div className="sticky top-0 z-10 text-left w-full font-semibold text-xl tracking-tighter shadow-xl bg-white">Các vé đã chọn</div>
-                                            {(selectedSeats && selectedSeats.length > 0)
+                                            {(selectedSeats[flight.flightId] || []).length > 0
                                                 ? (
                                                     <div className="space-y-3">
-                                                        {selectedSeats.map((ele, index) => (
+                                                        {(selectedSeats[flight.flightId] || []).map((ele, index) => (
                                                             <div key={index} className="w-[90%] rounded-md bg-slate-100 p-2">{ele}</div>
                                                         ))}
                                                         <p className="w-[90%] p-2 border-t border-teal-500">Total</p>
@@ -383,7 +414,7 @@ export function FlightCard({ flights }) {
                                                                     <Sofa
                                                                         key={index_}
                                                                         className={`w-7 h-7 min-h-[1.8rem]
-                                                                            ${selectedSeats.includes(`${seat.col}${rowNumber}`)
+                                                                            ${selectedSeats[flight.flightId]?.includes(`${seat.col}${rowNumber}`)
                                                                                 ? 'text-orange'
                                                                                 : 'text-teal-700'
                                                                             }
@@ -432,11 +463,11 @@ export function FlightCard({ flights }) {
                                                                         className={`w-7 h-7 min-h-[1.8rem] ${expandedClass === 'Business'
                                                                             ? 'cursor-not-allowed'
                                                                             : 'cursor-pointer hover:scale-125'
-                                                                            } ${selectedSeats.includes(`${seat.col}${rowNumber}`) &&
+                                                                            } ${selectedSeats[flight.flightId]?.includes(`${seat.col}${rowNumber}`) &&
                                                                                 (seat.col === 'A' || seat.col === 'F') &&
                                                                                 rowNumber >= 7
                                                                                 ? 'text-blue-700'
-                                                                                : selectedSeats.includes(`${seat.col}${rowNumber}`)
+                                                                                : selectedSeats[flight.flightId]?.includes(`${seat.col}${rowNumber}`)
                                                                                     ? 'text-[#35AB58]'
                                                                                     : 'text-teal-700'
                                                                             }`}
@@ -451,7 +482,7 @@ export function FlightCard({ flights }) {
                                                                 <h1 key={index_} className="h-7 min-h-[1.8rem] pt-[2px]">
                                                                     {rowNumber}
                                                                 </h1>
-                                                            );
+                                                            )
                                                         })}
                                                     </div>
                                                 </div>
