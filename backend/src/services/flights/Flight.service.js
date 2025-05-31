@@ -293,6 +293,8 @@ export const dbUnlockSeat = async (flightId, seatCode, userId) => {
                 lockExpiresAt: null
             })
         })
+        
+        console.log(`Ghế ${seatCode} đã được mở khóa bởi người dùng ${userId} trên chuyến bay ${flightId}.`)
 
         return true
     } catch (error) {
