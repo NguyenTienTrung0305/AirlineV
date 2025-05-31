@@ -24,7 +24,7 @@ app.use(session({
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        sameSite: 'None',
         path: '/',
         maxAge: 24 * 60 * 60 * 1000,
     },
@@ -38,10 +38,16 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
     origin: (origin, callback) => {
+
+        console.log('DEBUG (server.js): Incoming Request Origin:', origin)
+
+        // Kiểm tra nếu origin không có (vd: server-to-server, Postman không set Origin header)
+        // HOẶC nếu origin nằm trong danh sách cho phép
         if (allowedOrigins.includes(origin) || !origin) { // Thêm !origin để cho phép các request không có origin (ví dụ: từ server-side)
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'))
+            console.error('DEBUG (server.js): CORS Rejected - Origin mismatch. Incoming:', origin, 'Allowed:', allowedOrigins);
+            callback(new Error('Not allowed by CORS'));
         }
     },
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
