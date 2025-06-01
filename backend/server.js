@@ -9,19 +9,19 @@ const app = express()
 
 let allowedOrigins
 if (process.env.NODE_ENV === 'development') {
-    allowedOrigins = 'http://localhost:3000'
+    allowedOrigins = ['http://localhost:3000']
 } else {
-    allowedOrigins = 'https://airline-v.vercel.app/'
+    allowedOrigins = ['https://airline-v.vercel.app']
 }
 
 app.use(cors({
     origin: (origin, callback) => {
 
         console.log('DEBUG (server.js): Incoming Request Origin:', origin)
+        console.log('DEBUG (server.js): Incoming Request Origin:', origin)
 
-        // Kiểm tra nếu origin không có (vd: server-to-server, Postman không set Origin header)
-        // HOẶC nếu origin nằm trong danh sách cho phép
-        if (allowedOrigins.includes(origin) || !origin) { // Thêm !origin để cho phép các request không có origin (ví dụ: từ server-side)
+        // Kiểm tra nếu không có origin (vd: server-to-server, Postman không set Origin header)
+        if (allowedOrigins.includes(origin) || !origin) {
             callback(null, true);
         } else {
             console.error('DEBUG (server.js): CORS Rejected - Origin mismatch. Incoming:', origin, 'Allowed:', allowedOrigins);
@@ -48,7 +48,7 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV !== 'development',
         sameSite: 'None',
         path: '/',
         maxAge: 24 * 60 * 60 * 1000,
