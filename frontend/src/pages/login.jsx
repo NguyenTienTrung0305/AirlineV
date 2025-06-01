@@ -15,8 +15,10 @@ export default function Login() {
         formData,
         loading,
         handleInputChange,
-        handleSubmit
+        handleSubmit,
+        handleGoogleLogin
     } = useLoginForm(() => router.push("/"))
+
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-[url(/clouds-background.jpg)] bg-cover bg-center p-5">
@@ -80,12 +82,11 @@ export default function Login() {
                             variant="outline"
                             type="button"
                             className="w-full p-2 text-lg"
-                            onClick={() => {
-                                console.log("Google sign-in clicked");
-                            }}
+                            onClick={handleGoogleLogin}
+                            disabled={loading}
                         >
                             <FcGoogle />
-                            Đăng nhập với Google
+                            {loading ? "Đang đăng nhập..." : "Đăng nhập với Google"}
                         </Button>
                     </div>
 

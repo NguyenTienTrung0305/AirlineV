@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "@/auth/auth";
 import { toast, useToast } from "@/hooks/useToast";
-import { loginUserApi } from "@/util/api"
+import { loginGoogleApi, loginUserApi } from "@/util/api"
 
 
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth'
+import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 import firebase from "@/auth/firebase.js"
 
 export const useLoginForm = (onSuccess) => {
@@ -65,10 +65,58 @@ export const useLoginForm = (onSuccess) => {
             setLoading(false)
         }
     }
+
+
+    // login with google
+    const handleGoogleLogin = async (e) => {
+        setLoading(true)
+        e.preventDefault()
+
+        try {
+            const auth = getAuth(firebase)
+            const googleProvider = new GoogleAuthProvider()
+
+            const result = await signInWithPopup(auth, googleProvider)
+            const idToken = await result.user.getIdToken(true)
+
+            const response = await loginGoogleApi(idToken)
+
+            if (response.status === 200) {
+                toast({
+                    title: "Đăng nhập thành công!",
+                    description: "Chào mừng bạn trở lại.",
+                })
+                loginUser(response.data.user)
+                onSuccess?.()
+            }
+
+            else {
+                await auth.signOut()
+                toast({
+                    title: "Lỗi đăng nhập",
+                    description: data.message || "Đã xảy ra lỗi, vui lòng thử lại.",
+                    variant: "destructive",
+                })
+            }
+
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || "Không thể kết nối tới server"
+            toast({
+                title: "Lỗi hệ thống",
+                description: errorMessage,
+                variant: "destructive",
+            })
+        }
+        finally {
+            setLoading(false)
+        }
+    }
+
     return {
         formData,
         loading,
         handleSubmit,
         handleInputChange,
+        handleGoogleLogin
     }
 }

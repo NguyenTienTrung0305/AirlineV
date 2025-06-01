@@ -11,6 +11,11 @@ const loginAdminApi = async (idToken) => {
     return response;
 }
 
+const loginGoogleApi = async (idToken) => {
+    const response = await axios.post('/api/login/google', { idToken })  
+    return response;
+}
+
 const signupUserApi = (formData) => {
     const BASE_URL_API = '/api/user/new' // fetch to backend localhost://8080/api/signup
     const data = {
@@ -31,6 +36,7 @@ const createNewFlightApi = async (formData) => {
 export {
     loginUserApi,
     loginAdminApi,
+    loginGoogleApi,
     signupUserApi,
     createNewFlightApi
 }
