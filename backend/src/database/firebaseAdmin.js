@@ -30,6 +30,7 @@
 
 import { initializeApp, cert, getApp, getApps } from 'firebase-admin/app'
 import { getFirestore } from 'firebase-admin/firestore'
+import { getAuth } from 'firebase-admin/auth'
 import path from 'path';
 import { fileURLToPath } from 'url'
 import fs from 'fs'; 
@@ -66,7 +67,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const app = !getApps().length ? initializeApp({
     credential: cert(serviceAccount)
-}) : getApp(); 
+}) : getApp()
 
-export const admin = app
 export const db = getFirestore(app)
+export const auth = getAuth(app)
