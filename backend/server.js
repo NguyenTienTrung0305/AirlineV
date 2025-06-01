@@ -8,9 +8,9 @@ import initWebRoutes from './src/routes/index.js'
 const app = express()
 
 if (process.env.NODE_ENV === 'development') {
-    allowedOrigins = 'http://localhost:3000'
+    const allowedOrigins = 'http://localhost:3000'
 } else {
-    allowedOrigins = 'https://airline-v.vercel.app/'
+    const allowedOrigins = 'https://airline-v.vercel.app/'
 }
 
 app.use(cors({
