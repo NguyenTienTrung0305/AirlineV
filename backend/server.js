@@ -18,9 +18,6 @@ app.use(cors({
     origin: (origin, callback) => {
 
         console.log('DEBUG (server.js): Incoming Request Origin:', origin)
-        console.log('Request URL:', req.originalUrl)
-
-        // Kiểm tra nếu không có origin (vd: server-to-server, Postman không set Origin header)
         if (allowedOrigins.includes(origin) || !origin) {
             callback(null, true);
         } else {
