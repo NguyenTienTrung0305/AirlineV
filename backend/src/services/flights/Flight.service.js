@@ -1,4 +1,5 @@
-import { admin, db } from '../../database/firebaseAdmin.js'
+import { db } from '../../database/firebaseAdmin.js'
+import { Timestamp } from 'firebase-admin/firestore'
 import Flight from '../../models/flights/Flight.model.js'
 import SeatStatus from '../../models/flights/FlightSeatStatus.model.js'
 import SeatType from '../../models/flights/FlightSeatType.model.js'
@@ -226,8 +227,8 @@ export async function dbLockSeat(flightId, seatCode, userId, durationMs) {
             transaction.update(seatDocRef, {
                 isLocked: true,
                 lockedBy: userId,
-                lockedAt: admin.firestore.Timestamp.now(),
-                lockExpiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + durationMs),
+                lockedAt: Timestamp.now(),
+                lockExpiresAt: Timestamp.fromMillis(Date.now() + durationMs),
             })
 
             console.log(`Ghế ${seatCode} đã được khóa tạm thời cho người dùng ${userId} trên chuyến bay ${flightId}.`)
@@ -243,7 +244,7 @@ export async function dbLockSeat(flightId, seatCode, userId, durationMs) {
 export const dbUnlockExpireSeat = async (flightId) => {
     try {
         const seatCollectionRef = db.collection('flights').doc(flightId).collection('seats')
-        const now = admin.firestore.Timestamp.now()
+        const now = Timestamp.now()
         const querySnapshot = await seatCollectionRef
             .where('isLocked', '==', true)
             .where('lockExpiresAt', '<', now)
@@ -323,7 +324,7 @@ export const dbPurchaseSeat = async (userId, flightId, seatCode) => {
                 lockedBy: null,
                 lockExpiresAt: null,
                 soldTo: userId,
-                soldAt: admin.firestore.Timestamp.now()
+                soldAt: Timestamp.now()
             })
         })
 
