@@ -1,4 +1,4 @@
-import { admin, db } from "../../database/firebaseAdmin.js"
+import { auth, db } from "../../database/firebaseAdmin.js"
 
 import Admin from "../../models/users/Admin.model.js"
 
@@ -11,7 +11,7 @@ export const dbCreateAdmin = async ({
     lastName
 }) => {
     try {
-        const adminRecord = await admin.auth().createUser({ email, password })
+        const adminRecord = await auth.createUser({ email, password })
 
         const newAdmin = new Admin({ firstName, lastName, email })
         newAdmin.uid = adminRecord.uid

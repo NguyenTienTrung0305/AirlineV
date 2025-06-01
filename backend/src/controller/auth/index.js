@@ -1,4 +1,4 @@
-import { admin, db } from "../../database/firebaseAdmin.js"
+import { auth, db } from "../../database/firebaseAdmin.js"
 import crypto from 'crypto'
 
 import { dbCreateUser, dbGetUserById } from "../../services/users/User.service.js"
@@ -26,11 +26,11 @@ const generateCSRFToken = () => {
 export const userLogin = async (req, res) => {
     const { idToken } = req.body
     try {
-        const decodeToken = await admin.auth().verifyIdToken(idToken)
+        const decodeToken = await auth.verifyIdToken(idToken)
         const expiresIn = SESSION_EXPIRE_MS
         const userId = decodeToken.uid
 
-        const sessionCookies = await admin.auth().createSessionCookie(idToken, { expiresIn })
+        const sessionCookies = await auth.createSessionCookie(idToken, { expiresIn })
 
         // CSRF token
         const csrfToken = generateCSRFToken()
@@ -86,7 +86,7 @@ export const userLogin = async (req, res) => {
 export const adminLogin = async (req, res) => {
     const { idToken } = req.body
     try {
-        const decoded = await admin.auth().verifyIdToken(idToken)
+        const decoded = await auth.verifyIdToken(idToken)
         const expiresIn = SESSION_EXPIRE_MS
         const uid = decoded.uid
 
@@ -98,7 +98,7 @@ export const adminLogin = async (req, res) => {
             });
         }
 
-        const sessionCokies = await admin.auth().createSessionCookie(idToken, { expiresIn })
+        const sessionCokies = await auth.createSessionCookie(idToken, { expiresIn })
         const csrfToken = generateCSRFToken()
 
         // Lưu thông tin admin và CSRF token vào express-session
@@ -147,13 +147,13 @@ export const googleLogin = async (req, res) => {
     const { idToken } = req.body
 
     try {
-        const decodedToken = await admin.auth().verifyIdToken(idToken)
+        const decodedToken = await auth.verifyIdToken(idToken)
         const uid = decodedToken.uid
 
         const userData = await dbGetUserById(uid)
 
         // Create refresh token
-        const refreshToken = await admin.auth().createCustomToken(uid, {
+        const refreshToken = await auth.createCustomToken(uid, {
             role: ROLES.USER,
             refreshOnly: true
         });
@@ -228,7 +228,7 @@ export const checkSession = async (req, res) => {
     if (userCookieSession) {
 
         try {
-            const decodedClaims = await admin.auth().verifySessionCookie(userCookieSession)
+            const decodedClaims = await auth.verifySessionCookie(userCookieSession)
             userId = decodedClaims.uid
             role = 'user'
             req.session.csrfToken = req.cookies.userCsrfToken
@@ -240,7 +240,7 @@ export const checkSession = async (req, res) => {
         }
     } else if (adminCookieSession) {
         try {
-            const decodedClaims = await admin.auth().verifySessionCookie(adminCookieSession)
+            const decodedClaims = await auth.verifySessionCookie(adminCookieSession)
             userId = decodedClaims.uid
             role = 'admin'
             req.session.csrfToken = req.cookies.adminCsrfToken

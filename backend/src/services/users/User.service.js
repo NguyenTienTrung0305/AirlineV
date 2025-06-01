@@ -1,4 +1,4 @@
-import { admin, db } from "../../database/firebaseAdmin.js"
+import { auth, db } from "../../database/firebaseAdmin.js"
 
 import User from "../../models/users/User.model.js"
 
@@ -15,18 +15,18 @@ export const dbCreateUser = async ({
         // Lưu tài khoảng trên firebase, sử dụng cùng với firebase-client sdk để xác thực người dùng 
         // firebase-client sdk sẽ gửi thông tin đăng nhập đến firebase, Firebase kiểm tra xem email và mật khẩu 
         // này có khớp với tài khoản nào đã được tạo trước đó không, nếu có trả về idToken
-        const userRecord =  await admin.auth().createUser({ email: email, password: password })
+        const userRecord = await auth.createUser({ email: email, password: password })
 
         const newUser = new User({ firstName, lastName, email })
         newUser.createdAt = new Date()
         newUser.updatedAt = new Date()
         newUser.uid = userRecord.uid
-        
+
         // tạo document mới có uid là userRecord.uid (chưa tồn tại thì firebase sẽ tự tạo), chứa các field của newUser
         // users (collection)
         // └── user123 (document uid)
         //     └── { firstName: "John", email: "john@email.com", uid: "okjiKHNNajs"... }
-        const userRef = db.collection(USER_COLLECTION_NAME).doc(userRecord.uid) 
+        const userRef = db.collection(USER_COLLECTION_NAME).doc(userRecord.uid)
         await userRef.set(newUser.toObject())
         return newUser
     }

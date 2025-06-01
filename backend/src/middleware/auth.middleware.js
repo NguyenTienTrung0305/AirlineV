@@ -1,5 +1,5 @@
 import NodeCache from "node-cache"
-import { admin, db } from "../database/firebaseAdmin.js"
+import { auth, db } from "../database/firebaseAdmin.js"
 import { getCache, userCache } from "../cache/cache.js"
 import crypto from 'crypto'
 
@@ -28,7 +28,7 @@ export const verifySessionAndCSRF = async (req, res, next) => {
     }
 
     try {
-        const decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true)
+        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true)
         const userId = decodedClaims.uid
 
         let userData = getCache(userCache, userId)
