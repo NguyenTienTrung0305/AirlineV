@@ -123,7 +123,7 @@ export const dbCreateFlight = async (flightData, rows, cols, seatTypes, startRow
     }
 }
 
-export const dbGetFlights = async (flightId) => {
+export const dbGetFlightById = async (flightId) => {
     try {
         const flightDocRef = db.collection('flights').doc(flightId)
         const flightSnap = await flightDocRef.get()
@@ -136,6 +136,20 @@ export const dbGetFlights = async (flightId) => {
     } catch (error) {
         console.error("Lỗi khi lấy thông tin chuyến bay:", error)
         return null
+    }
+}
+
+export const dbUpdateFlightById = async (flightId, updatedFlightData) => {
+    try {
+        const isUpdated = await db.collection('flights').doc(flightId).update({ ...updatedFlightData })
+        if (isUpdated) {
+            return true
+        } else {
+            return false
+        }
+    } catch (error) {
+        console.error("Lỗi khi cập nhật thông tin chuyến bay:", error)
+        return false
     }
 }
 
@@ -294,7 +308,7 @@ export const dbUnlockSeat = async (flightId, seatCode, userId) => {
                 lockExpiresAt: null
             })
         })
-        
+
         console.log(`Ghế ${seatCode} đã được mở khóa bởi người dùng ${userId} trên chuyến bay ${flightId}.`)
 
         return true

@@ -1,7 +1,8 @@
 import express from 'express'
-import { createNewFlight, getFlightSuggesion, getTypeSeats, lockSeat, searchFlightMock, unlockSeat } from '../../controller/flights/Flight.controller.js'
+import { createNewFlight, getFlightById, getFlightSuggesion, getTypeSeats, lockSeat, searchFlightMock, unlockSeat } from '../../controller/flights/Flight.controller.js'
 
 const router = express.Router()
+router.get('/', getFlightById)
 router.post('/new', createNewFlight)
 router.get('/search', searchFlightMock)
 router.get('/suggesion', getFlightSuggesion)

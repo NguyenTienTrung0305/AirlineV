@@ -1,6 +1,5 @@
-import { setCache } from "../../cache/cache.js"
-import SeatType from "../../models/flights/FlightSeatType.model.js"
-import { dbCreateFlight, dbCreateTypeSeats, dbGetTypeSeat, dbLockSeat, dbGetFlightSeats, dbGetAllTypeSeats, dbUnlockExpireSeat, dbUnlockSeat } from "../../services/flights/Flight.service.js"
+import { flightCache, getCache, setCache } from "../../cache/cache.js"
+import { dbCreateFlight, dbCreateTypeSeats, dbGetTypeSeat, dbLockSeat, dbGetFlightSeats, dbGetAllTypeSeats, dbUnlockExpireSeat, dbUnlockSeat, dbGetFlightById, dbUpdateFlightById } from "../../services/flights/Flight.service.js"
 import { generateFlightsSuggestion, generateMockFlights } from "../../services/flights/FlightGenerate.service.js"
 
 export const createTypeSeats = async (req, res) => {
@@ -51,6 +50,56 @@ export const getTypeSeats = async (req, res) => {
         })
     }
 }
+
+
+export const getFlightById = async (req, res) => {
+    try {
+        const { flightId } = req.query
+
+        const cachedFlight = getCache(flightCache, flightId)
+        if (cachedFlight) {
+            return res.status(200).send({
+                message: "Flight fetched successfully ",
+                code: "GET_FLIGHT_SUCCESS",
+                data: cachedFlight,
+            })
+        }
+
+        const flightData = await dbGetFlightById(flightId)
+        if (!flightData) {
+            return res.status(404).json({
+                message: "Flight not found",
+                code: "FLIGHT_NOT_FOUND",
+            })
+        }
+
+        const currTime = new Date()
+        if ((new Date(flightData.arrivalTime) < currTime) && flightData.status !== "Landed") {
+            flightData.status = "Landed"
+            const isUpdated = await dbUpdateFlightById(flightId, flightData)
+            if (!isUpdated) {
+                return res.status(500).json({
+                    message: "Can not update flight status",
+                    code: "CAN_NOT_UPDATE_FLIGHT_STATUS"
+                })
+            }
+        }
+
+        setCache(flightCache, flightId, flightData)
+
+        return res.status(200).json({
+            message: "Get Flight Success",
+            code: "GET_FLIGHT_SUCCESS",
+            data: flightData
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: "Can not fetch to server",
+            code: "INTERNAL_SERVER_ERROR" || error.message.code,
+        })
+    }
+}
+
 
 
 export const createNewFlight = async (req, res) => {
