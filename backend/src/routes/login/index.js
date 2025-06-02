@@ -10,5 +10,5 @@ const router = express.Router()
 
 router.post('/user', userLogin)
 router.post('/admin', adminLogin)
-
+router.post('/google', googleLogin)
 export default router

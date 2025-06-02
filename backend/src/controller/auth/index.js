@@ -1,8 +1,9 @@
 import { auth, db } from "../../database/firebaseAdmin.js"
+import { Timestamp } from "firebase-admin/firestore"
 import crypto from 'crypto'
 
-import { dbCreateUser, dbGetUserById } from "../../services/users/User.service.js"
-import { dbCreateAdmin, dbGetAdminById } from "../../services/users/Admin.service.js"
+import { dbGetUserById, dbCreateUserFromGoogle } from "../../services/users/User.service.js"
+import { dbGetAdminById } from "../../services/users/Admin.service.js"
 import { getCache, userCache } from "../../cache/cache.js"
 
 
@@ -55,8 +56,8 @@ export const userLogin = async (req, res) => {
             httpOnly: true, // cookie chỉ được truy cập từ phía server
             path: '/', // cookie được gửi khi truy cập các url bắt đầu bằng "/" (đường dẫn ở frontend) => tức là toàn bộ trang web
             maxAge: expiresIn,
-            secure: true,
-            sameSite: 'strict',
+            secure: true, // Đảm bảo cookie chỉ được gửi qua HTTPS không gửi được qua HTTP
+            sameSite: 'strict', // cookie chỉ được gửi trong các yêu cầu có cùng protocal, domain và port, tức là nhấp vào liên kết ra trang web bên ngoài cookie sẽ không được gửi
         })
 
         res.cookie("userCsrfToken", csrfToken, {
@@ -148,36 +149,98 @@ export const googleLogin = async (req, res) => {
 
     try {
         const decodedToken = await auth.verifyIdToken(idToken)
-        const uid = decodedToken.uid
 
-        const userData = await dbGetUserById(uid)
+        const uid = decodedToken.user_id || decodedToken.uid
+        const email = decodedToken.email
+        const name = decodedToken.name || decodedToken.display_name
+        const expiresIn = SESSION_EXPIRE_MS
 
-        // Create refresh token
-        const refreshToken = await auth.createCustomToken(uid, {
-            role: ROLES.USER,
-            refreshOnly: true
-        });
+        // create session cookie
+        const sessionCookies = await auth.createSessionCookie(idToken, { expiresIn })
+        const csrfToken = generateCSRFToken()
 
-        // Set HTTP-only cookies
-        res.cookie('sessionToken', idToken, COOKIE_CONFIG)
-        res.cookie('refreshToken', refreshToken, REFRESH_COOKIE_CONFIG)
+        let userData = await dbGetUserById(uid)
+        if (!userData) {
+            let firstName = ''
+            let lastName = ''
+            console.log(name)
+            if (name) {
+                firstName = name.trim().split(' ')[0] || ''
+                lastName = name.trim().split(' ').slice(1).join(' ') || ''
+            } else {
+                firstName = email.split('@')[0];
+                lastName = ''
+            }
 
-        // Generate CSRF token if middleware is active
-        if (req.csrfToken) {
-            const csrfToken = req.csrfToken()
+            const newUserData = {
+                uid: uid,
+                email: email,
+                firstName: firstName,
+                lastName: lastName,
+                role: ROLES.USER,
+                createdAt: Timestamp.now(),
+                updatedAt: Timestamp.now()
+            }
+            userData = await dbCreateUserFromGoogle(uid, newUserData)
+            if (!userData) {
+                return res.status(400).json({
+                    message: "Tạo tài khoản thất bại",
+                    code: "USER_CREATION_FAILED"
+                })
+            }
+        } else {
+            // update info if info is changed on gooogle
+            const updateData = {}
+            if (name) {
+                const nameParts = name.trim().split(' ')
+                const newFirstName = nameParts[0] || ''
+                const newLastName = nameParts.slice(1).join(' ') || ''
 
-            return res.status(200).json({
-                user: userData,
-                csrfToken,
-                message: "Đăng nhập Google thành công"
-            })
+                if (newFirstName !== userData.firstName) {
+                    updateData.firstName = newFirstName
+                }
+                if (newLastName !== userData.lastName) {
+                    updateData.lastName = newLastName
+                }
+
+                if (Object.keys(updateData).length > 0) {
+                    updateData.updatedAt = Timestamp.now()
+                    await db.collection(USER_COLLECTION_NAME).doc(uid).update(updateData)
+                    userData = { ...userData, ...updateData }
+                }
+            }
         }
+
+        // store infomation user into express-session
+        req.session.userId = uid
+        req.session.user = userData
+        req.session.role = ROLES.USER
+        req.session.csrfToken = csrfToken
+
+        res.cookie('userSession', sessionCookies, {
+            httpOnly: true,
+            path: '/',
+            maxAge: expiresIn,
+            secure: process.env.NODE_ENV !== 'development',
+            sameSite: 'strict'
+        })
+
+
+        res.cookie('userCsrfToken', csrfToken, {
+            httpOnly: false,
+            path: '/',
+            maxAge: expiresIn,
+            secure: process.env.NODE_ENV !== 'development',
+            sameSite: 'strict'
+        })
 
         return res.status(200).json({
             user: userData,
-            message: "Đăng nhập Google thành công"
-        });
+            message: "Đăng nhập thành công",
+            code: "LOGIN_SUCCESS"
+        })
     } catch (error) {
+        console.error("Error in googleLogin:", error)
         return res.status(401).json({
             message: "Đăng nhập Google thất bại",
             code: "GOOGLE_AUTH_FAILED"

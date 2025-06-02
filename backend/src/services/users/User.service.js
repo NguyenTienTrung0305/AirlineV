@@ -36,6 +36,32 @@ export const dbCreateUser = async ({
 }
 
 
+export const dbCreateUserFromGoogle = async (uid, userData) => {
+    try {
+        // Không cần tạo user trên Firebase Auth vì Google đã tạo rồi
+        // Chỉ cần tạo document trong Firestore với uid đã có
+        const newUser = new User({
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            email: userData.email,
+            role: userData.role,
+        })
+
+        newUser.uid = uid
+        newUser.createdAt = userData.createdAt
+        newUser.updatedAt = userData.updatedAt
+
+        const userRef = db.collection(USER_COLLECTION_NAME).doc(uid)
+        await userRef.set(newUser.toObject())
+
+        return newUser
+    }
+    catch (error) {
+        console.log(`creating user from Google failed: ${error.message}`)
+        return null
+    }
+}
+
 export const dbGetUserById = async (uid) => {
     try {
         const userRef = db.collection(USER_COLLECTION_NAME).doc(uid)
@@ -46,11 +72,11 @@ export const dbGetUserById = async (uid) => {
             user.uid = userDoc.id
             return user
         }
-
-        throw new Error(`user not found: ${uid}`)
+        return null
     }
     catch (error) {
-        throw new Error(`getting user failed: ${error.message}`)
+        console.error(`Error getting user ${uid}:`, error.message)
+        return null
     }
 }
 

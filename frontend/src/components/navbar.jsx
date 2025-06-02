@@ -116,7 +116,7 @@ export default function NavBar() {
                                             <FiSettings size={16} />
                                             Cài đặt
                                         </Link>
-                                        <button onClick={logout} className="flex items-center gap-2 text-sm text-red-600">
+                                        <button onClick={handleLogout} className="flex items-center gap-2 text-sm text-red-600">
                                             <FiLogOut size={16} />
                                             Đăng xuất
                                         </button>
