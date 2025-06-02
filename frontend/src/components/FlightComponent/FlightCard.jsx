@@ -366,7 +366,19 @@ export function FlightCard({ flights }) {
                                                             <div key={index} className="w-[90%] rounded-md bg-slate-100 p-2">{ele}</div>
                                                         ))}
                                                         <p className="w-[90%] p-2 border-t border-teal-500">Total</p>
-                                                        <Button className="p-2 bg-blue-500 w-[90%] text-white hover:bg-blue-800 transition-all duration-300">Continue to Payment</Button>
+                                                        <Button
+                                                            className="p-2 bg-blue-500 w-[90%] text-white hover:bg-blue-800 transition-all duration-300"
+                                                            onClick={() =>
+                                                                router.push({
+                                                                    pathname: "/check-in",
+                                                                    query: {
+                                                                        flightId: flight.flightId
+                                                                    }
+                                                                })
+                                                            }
+                                                        >
+                                                            Continue to Payment
+                                                        </Button>
                                                     </div>
                                                 )
                                                 : (
