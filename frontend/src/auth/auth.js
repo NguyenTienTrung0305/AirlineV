@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }) => {
     // Public logout function with redirect
     const logout = async () => {
         try {
-            await axios.post('/api/auth/logout') // Backend route to clear session cookies
+            await axios.post('/admin/auth/logout') // Backend route to clear session cookies
             await logoutInternal() // để xóa trạng thái và cookie ở frontend
             await signOut(getAuth(firebase)) // Sign out from Firebase as well
             router.push("/login")
