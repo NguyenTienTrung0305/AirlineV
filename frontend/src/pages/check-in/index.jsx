@@ -1,6 +1,8 @@
 "use-client"
 
+import { CheckInConfrm } from "@/components/check-in/check-in-confirm"
 import FlightDetailStep from "@/components/check-in/flight-detail-step"
+import { PassengerList } from "@/components/check-in/passenger-list"
 import { StepIndicator } from "@/components/check-in/step-indicator"
 import { formatFlightDuration } from "@/hooks/useFlightData"
 import axios from "@/util/axiosCustom"
@@ -27,13 +29,18 @@ const steps = [
 export default function CheckIn() {
     const router = useRouter()
     const {
-        flightId
+        flightId,
+        seats,
+        passengers
     } = router.query
-
 
     const [currentStep, setCurrentStep] = useState(0)
     const [departureFlight, setDepartureFlight] = useState(null)
     const [returnFlight, setReturnFlight] = useState(null)
+
+    const [passengersData, setPassengersData] = useState([])
+
+
 
 
 
@@ -75,8 +82,6 @@ export default function CheckIn() {
                 )
             }
 
-            console.log(formattedFlight)
-
 
             if (type === "departure") {
                 setDepartureFlight(formattedFlight)
@@ -95,6 +100,55 @@ export default function CheckIn() {
         }
     }, [fetchFlight, flightId])
 
+
+
+
+
+    // Điều hướng steps
+    const handleContinue = async () => {
+        if (currentStep < steps.length - 1) {
+            setCurrentStep((prev) => (prev + 1))
+        }
+    }
+
+    const handlePassengerContinue = async (passengerList) => {
+        const mappedPassengers = mapSeatsWithPassengers(passengerList, seats)
+        console.log(mappedPassengers)
+        setPassengersData(mappedPassengers)
+        if (currentStep < steps.length - 1) {
+            setCurrentStep((prev) => (prev + 1))
+        }
+    }
+
+    const hanldeBack = async () => {
+        if (currentStep > 0) {
+            setCurrentStep((prev) => (prev - 1))
+        }
+    }
+
+
+
+
+
+
+    // map seats with passenger
+    const mapSeatsWithPassengers = (passengers, selectedSeats) => {
+        if (selectedSeats.length < passengers.length) {
+            console.error("Số lượng ghế không đủ cho số lượng hành khách")
+            return passengers
+        }
+
+        const mappedPassengers = passengers.map((passenger, index) => ({
+            ...passenger,
+            seat: selectedSeats[index] || null
+        }))
+
+        return mappedPassengers
+    }
+    useEffect(() => {
+
+    }, [])
+
     return (
         <div className="container mx-auto p-6">
             <StepIndicator currentStep={currentStep} steps={steps} />
@@ -102,7 +156,26 @@ export default function CheckIn() {
             {currentStep === 0 && (
                 <FlightDetailStep
                     flightDetails={departureFlight}
-                    passengerCount={4}
+                    passengerCount={passengers}
+                    onContinue={handleContinue}
+                    onCancel={() => window.history.back()}
+                />
+            )}
+
+            {currentStep === 1 && (
+                <PassengerList
+                    passengers={passengers}
+                    onContinue={handlePassengerContinue}
+                    onBack={hanldeBack}
+                />
+            )}
+
+            {currentStep === 2 && (
+                <CheckInConfrm
+                    flight={departureFlight}
+                    passengerList={passengersData}
+                    onBack={hanldeBack}
+                    onHome={() => router.push("/")}
                 />
             )}
         </div>

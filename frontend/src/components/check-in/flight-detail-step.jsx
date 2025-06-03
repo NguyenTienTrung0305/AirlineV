@@ -79,7 +79,7 @@ const FlightDetailCard = ({ title, flightDetails, passengerCount }) => {
     )
 }
 
-export default function FlightDetailStep({ flightDetails, passengerCount }) {
+export default function FlightDetailStep({ flightDetails, passengerCount, onCancel, onContinue }) {
     if (!flightDetails) {
         return (
             <SkeletonFlightCard />
@@ -96,6 +96,38 @@ export default function FlightDetailStep({ flightDetails, passengerCount }) {
                             flightDetails={flightDetails}
                             passengerCount={passengerCount}
                         />
+                    </CardContent>
+                </Card>
+
+
+                {/* Các vật phẩm bị cấm */}
+                <Card className="shadow-lg border-orange mb-8">
+                    <CardContent className="p-4 sm:p-6">
+                        <div className='pt-3'>
+                            <h3 className='font-semibold mb-4 text-blue-400 text-xl sm:text-2xl'>Các vật phẩm bị cấm</h3>
+                            <div className='grid grid-cols-2 sm:grid-cols-3 gap-4 mt-3 sm:mt-auto'>
+                                {prohibitedItems.map((item, index) => (
+                                    <div key={index} className='flex items-center space-x-3'>
+                                        <div className='flex-shrink-0'>
+                                            <item.icon className='h-6 w-6 text-orange' />
+                                        </div>
+                                        <div>
+                                            <div className='text-sm text-gray-500'>{item.label}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+
+                        <div className="flex justify-end gap-4 mt-6">
+                            <Button variant="outline" className="p-1 w-auto" onClick={onCancel}>
+                                Quay lại
+                            </Button>
+                            <Button variant="orange" className="p-1 w-auto" onClick={onContinue}>
+                                Tiếp tục
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

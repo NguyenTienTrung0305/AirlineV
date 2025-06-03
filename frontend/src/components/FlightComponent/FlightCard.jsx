@@ -372,7 +372,9 @@ export function FlightCard({ flights }) {
                                                                 router.push({
                                                                     pathname: "/check-in",
                                                                     query: {
-                                                                        flightId: flight.flightId
+                                                                        flightId: flight.flightId,
+                                                                        seats: selectedSeats[flight.flightId],
+                                                                        passengers: selectedSeats[flight.flightId].length
                                                                     }
                                                                 })
                                                             }

@@ -61,6 +61,11 @@
   background-color: red;
 }
 
+.print-mode .bg-gradient-to-br {
+  background: #ef4444 !important; /* bg-red-500 */
+  background-image: none !important;
+}
+
   
 @layer base {
   :root {
