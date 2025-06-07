@@ -86,16 +86,16 @@ export function CheckInConfrm({
                     }
                 });
 
-                console.log('Image generated, length:', dataUrl.length);
+                console.log('Image generated, length:', dataUrl.length)
 
-                const pdf = new jsPDF();
-                const img = new Image();
+                const pdf = new jsPDF()
+                const img = new Image()
 
                 img.onload = function () {
                     const imgWidth = 150;
-                    const imgHeight = (img.height * imgWidth) / img.width;
-                    pdf.addImage(dataUrl, 'PNG', 30, 30, imgWidth, imgHeight);
-                    pdf.save('ticket.pdf');
+                    const imgHeight = (img.height * imgWidth) / img.width
+                    pdf.addImage(dataUrl, 'PNG', 30, 30, imgWidth, imgHeight)
+                    pdf.save('ticket.pdf')
                 };
 
                 img.src = dataUrl;
@@ -103,6 +103,141 @@ export function CheckInConfrm({
             } catch (error) {
                 console.error('Error with dom-to-image:', error);
             }
+        }
+    }
+
+    const handlePrint = async () => {
+        if (ticketRef.current) {
+            try {
+                const printWindow = window.open('', '_blank');
+
+                // Lấy HTML content của vé
+                const ticketHTML = ticketRef.current.outerHTML
+
+                // Tạo HTML document cho trang in
+                const printDocument = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>VÉ MÁY BAY - ${currentTicket?.passenger?.name || ''}</title>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                    <style>
+                        @media print {
+                            body {
+                                margin: 0;
+                                padding: 20px;
+                                background: white;
+                            }
+                            .no-print {
+                                display: none !important;
+                            }
+                            
+                            .ticket-container {
+                                max-width: 400px;
+                                margin: 0 auto;
+                                page-break-inside: avoid;
+                            }
+                        }
+                        
+                        @page {
+                            size: A4;
+                            margin: 1cm;
+                        }
+                        
+                        body {
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                            line-height: 1.5;
+                            color: #333;
+                            background: white;
+                            padding: 20px;
+                        }
+                        
+                        .print-header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #e5e7eb;
+                            padding-bottom: 20px;
+                        }
+                        
+                        .print-header h1 {
+                            color: #236C5B;
+                            font-size: 28px;
+                            font-weight: bold;
+                            margin: 0;
+                        }
+                        
+                        .print-header p {
+                            color: #26846E;
+                            margin: 10px 0 0 0;
+                            font-size: 14px;
+                            text-transform: uppercase;
+                        }
+                        
+                        .ticket-container {
+                            max-width: 400px;
+                            margin: 0 auto;
+                        }
+                        
+                        .print-footer {
+                            text-align: center;
+                            margin-top: 30px;
+                            padding-top: 20px;
+                            border-top: 1px solid #e5e7eb;
+                            color: #6b7280;
+                            font-size: 12px;
+                        }
+                        
+
+                        svg {
+                            display: inline-block;
+                            vertical-align: middle;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-header">
+                        <h1>AirlineV</h1>
+                        <p>Vé điện tử - Vui lòng xuất trình khi lên máy bay</p>
+                    </div>
+                    
+                    <div class="ticket-container">
+                        ${ticketHTML}
+                    </div>
+                    
+                    <div class="print-footer">
+                        <p>Cảm ơn quý khách đã chọn AirlineV</p>
+                        <p>Vui lòng có mặt tại sân bay trước giờ bay ít nhất 2 tiếng</p>
+                        <p>In lúc: ${new Date().toLocaleString('vi-VN')}</p>
+                    </div>
+                    
+                    <script>
+                        // Tự động in khi trang load xong
+                        window.onload = function() {
+                            setTimeout(function() {
+                                window.print()
+
+                                // Đóng cửa sổ sau khi in hoặc hủy in
+                                window.onafterprint = function() {
+                                    window.close()
+                                }
+                            }, 500)
+                        }
+                    </script>
+                </body>
+                </html>
+            `;
+
+                // Ghi HTML vào cửa sổ mới
+                printWindow.document.write(printDocument)
+                printWindow.document.close()
+
+            } catch (error) {
+                console.error('Lỗi khi in vé:', error)
+                alert('Có lỗi xảy ra khi in vé. Vui lòng thử lại.')
+            }
+        } else {
+            alert('Không tìm thấy thông tin vé để in')
         }
     }
 
@@ -162,7 +297,7 @@ export function CheckInConfrm({
                                 <Download className="w-4 h-4" />
                                 Tải về
                             </Button>
-                            <Button variant="outline" size="sm" className="gap-2">
+                            <Button variant="outline" size="sm" className="gap-2" onClick={handlePrint}>
                                 <Printer className="w-4 h-4" />
                                 In vé
                             </Button>

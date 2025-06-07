@@ -24,7 +24,7 @@ export function FlightTicket({
                         width={144}
                         height={144}
                     />
-                    <h2 className="text-2xl font-bold">QAirlines</h2>
+                    <h2 className="text-2xl font-bold">AirlineV</h2>
                 </div>
 
                 {/* ticket details */}
@@ -33,18 +33,18 @@ export function FlightTicket({
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-xs uppercase tracking-wide text-zinc-100">Hành Khách</p>
-                            <p className="mt-1 text-lg font-semibold flex items-center">
+                            <div className="mt-1 text-lg font-semibold flex items-center">
                                 <User className="w-5 h-5 mr-2" />
                                 <p className="text-sm">{passengerName}</p>
-                            </p>
+                            </div>
                         </div>
 
                         <div>
                             <p className="text-xs uppercase tracking-wide text-zinc-100">Chuyến bay</p>
-                            <p className="text-lg font-semibold flex items-center mt-1">
+                            <div className="text-lg font-semibold flex items-center mt-1">
                                 <Plane className="w-5 h-5 mr-2" />
                                 <p className="text-sm font-semibold">{flightCode}</p>
-                            </p>
+                            </div>
                         </div>
                     </div>
 
@@ -52,18 +52,18 @@ export function FlightTicket({
                     <div className="flex justify-between items-center">
                         <div>
                             <p className="text-xs uppercase tracking-wide text-zinc-100">Giờ khởi hành</p>
-                            <p className="mt-1 text-lg font-semibold flex items-center">
+                            <div className="mt-1 text-lg font-semibold flex items-center">
                                 <Clock1 className="w-5 h-5 mr-2" />
                                 <p className="text-sm">{departureTime}</p>
-                            </p>
+                            </div>
                         </div>
 
                         <div>
                             <p className="text-xs uppercase tracking-wide text-zinc-100">Giờ đến nơi</p>
-                            <p className="text-lg font-semibold flex items-center mt-1">
+                            <div className="text-lg font-semibold flex items-center mt-1">
                                 <Clock className="w-5 h-5 mr-2" />
                                 <p className="text-sm font-semibold">{arrivalTime}</p>
-                            </p>
+                            </div>
                         </div>
                     </div>
 
@@ -71,18 +71,18 @@ export function FlightTicket({
                     <div className="flex justify-between items-center pb-6">
                         <div>
                             <p className="text-xs uppercase tracking-wide text-zinc-100">Xuất phát từ</p>
-                            <p className="mt-1 text-lg font-semibold flex items-center">
+                            <div className="mt-1 text-lg font-semibold flex items-center">
                                 <MapPin className="w-5 h-5 mr-2" />
                                 <p className="text-sm uppercase">{departureCity.split(' ').slice(0, departureCity.split(' ').slice().length - 2).join(' ')}</p>
-                            </p>
+                            </div>
                         </div>
 
                         <div>
                             <p className="text-xs uppercase tracking-wide text-zinc-100">Địa điểm đến</p>
-                            <p className="text-lg font-semibold flex items-center mt-1">
+                            <div className="text-lg font-semibold flex items-center mt-1">
                                 <MapPinCheck className="w-5 h-5 mr-2" />
                                 <p className="text-sm uppercase">{arrivalCity.split(' ').slice(0, arrivalCity.split(' ').slice().length - 2).join(' ')}</p>
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>

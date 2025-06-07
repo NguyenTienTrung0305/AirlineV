@@ -5,18 +5,30 @@ import { RadioGroup } from "../ui/radio";
 import { RadioGroupItem } from "../ui/radio";
 import { Button } from "../ui/button";
 
-export function FlightFilter({ ...props }) {
-    const [budget, setBudget] = useState([100000, 4000000])
-    const [departureTime, setDepartureTime] = useState("all")
+export function FlightFilter({ filters, setFilters, props }) {
+    const [budget, setBudget] = useState(filters.budget)
+    const [departureTime, setDepartureTime] = useState(filters.departureTime)
+
     const handleResetFilters = () => {
-        const defaultBudget = [1000000, 4000000]
+        const defaultBudget = [1000000, 10000000]
         const defaultDepartureTime = "all"
         setBudget(defaultBudget)
         setDepartureTime(defaultDepartureTime)
+        setFilters((prev) => {
+            return {
+                ...prev,
+                budget: defaultBudget,
+                departureTime: defaultDepartureTime
+            }
+        })
     }
 
     const handleApplyFilters = () => {
-        alert('done')
+        setFilters((prev) => ({
+            ...prev,
+            budget: budget,
+            departureTime: departureTime
+        }))
     }
 
     return (
@@ -37,8 +49,8 @@ export function FlightFilter({ ...props }) {
                         </div>
                         <Slider
                             min={100000}
-                            max={4000000}
-                            step={1000}
+                            max={10000000}
+                            step={10000}
                             value={budget}
                             onValueChange={setBudget}
                             className="mt-2"

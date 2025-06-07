@@ -39,7 +39,7 @@ export function PassengerList({ passengers, onContinue, onBack }) {
                 <form onSubmit={handleContinue}>
                     <div className="space-y-6">
                         {passengerList.map((passenger, index) => (
-                            <div className="space-y-1">
+                            <div key={index} className="space-y-1">
                                 <h4 className="font-semibold text-orange">Hành khách {index + 1}</h4>
                                 <div key={index} className="border border-zinc-300 p-4 rounded-md">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -86,7 +86,7 @@ export function PassengerList({ passengers, onContinue, onBack }) {
                     </div>
 
                     {/* navigate */}
-                    <div div className="flex justify-end gap-4 mt-6" >
+                    <div className="flex justify-end gap-4 mt-6" >
                         <Button variant="outline" className="p-1 w-auto" onClick={onBack}>
                             Quay Lại
                         </Button>
