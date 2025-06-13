@@ -133,21 +133,20 @@ export default function CheckIn() {
 
     // map seats with passenger
     const mapSeatsWithPassengers = (passengers, selectedSeats) => {
-        if (selectedSeats.length < passengers.length) {
+        const seatsArray = Array.isArray(selectedSeats) ? selectedSeats : [selectedSeats]
+
+        if (seatsArray.length < passengers.length) {
             console.error("Số lượng ghế không đủ cho số lượng hành khách")
             return passengers
         }
 
         const mappedPassengers = passengers.map((passenger, index) => ({
             ...passenger,
-            seat: selectedSeats[index] || null
+            seat: seatsArray[index] || null
         }))
 
         return mappedPassengers
     }
-    useEffect(() => {
-
-    }, [])
 
     return (
         <div className="container mx-auto p-6">

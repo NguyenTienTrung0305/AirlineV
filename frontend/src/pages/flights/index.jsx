@@ -32,9 +32,28 @@ export default function FlightBooking() {
     } = router.query
 
     const {
-        flights,
-        isLoading
+        fetchReturnFlights,
+        returnFlights,
+        isLoading,
+
+        filters,
+        setFilters,
+        filteredFlights,
+
+        setFlights,
     } = useFlightData(fromAirport, toAirport, departureDate)
+
+
+
+    // Fetch return flights if it's a round trip
+    useEffect(() => {
+        const loadReturnFlights = async () => {
+            if (tripType === "roundTrip") {
+                await fetchReturnFlights(toAirport, fromAirport, returnDate)
+            }
+        }
+        loadReturnFlights()
+    }, [tripType, fetchReturnFlights, toAirport, fromAirport, returnDate])
 
 
     useEffect(() => {
@@ -71,7 +90,7 @@ export default function FlightBooking() {
             />
 
             <div className="flex flex-col lg:flex-row gap-4 p-4 bg-gray-100 min-h-screen max-w-7xl m-auto" data-aos="fade-up-left">
-                <FlightFilter data-aos="fade-down" />
+                <FlightFilter data-aos="fade-down" filters={filters} setFilters={setFilters} />
                 <div className="flex-1 gap-y-4">
                     {!isLoading && (
                         <FlightSelectionNotice />
@@ -87,7 +106,7 @@ export default function FlightBooking() {
                         </>
                     ) : (
                         <FlightCard
-                            flights={flights}
+                            flights={filteredFlights}
                         />
                     )}
 
