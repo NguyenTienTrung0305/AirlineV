@@ -56,16 +56,16 @@ export const userLogin = async (req, res) => {
             httpOnly: true, // cookie chỉ được truy cập từ phía server
             path: '/', // cookie được gửi khi truy cập các url bắt đầu bằng "/" (đường dẫn ở frontend) => tức là toàn bộ trang web
             maxAge: expiresIn,
-            secure: true, // Đảm bảo cookie chỉ được gửi qua HTTPS không gửi được qua HTTP
-            sameSite: 'strict', // cookie chỉ được gửi trong các yêu cầu có cùng protocal, domain và port, tức là nhấp vào liên kết ra trang web bên ngoài cookie sẽ không được gửi
+            secure: process.env.NODE_ENV === 'production', // Secure true đảm bảo cookie chỉ được gửi qua HTTPS không gửi được qua HTTP
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax', // sameSite strict => cookie chỉ được gửi trong các yêu cầu có cùng protocal, domain và port, tức là nhấp vào liên kết ra trang web bên ngoài cookie sẽ không được gửi
         })
 
         res.cookie("userCsrfToken", csrfToken, {
             httpOnly: false, // cho phép frontend JavaScript đọc qua document.cookie => để gửi csrfTokne trong request cho backend xác thực
             path: '/',
             maxAge: expiresIn,
-            secure: true,
-            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
         })
 
         // Success without CSRF
@@ -112,16 +112,16 @@ export const adminLogin = async (req, res) => {
             httpOnly: true,
             path: "/admin", // Cookie chỉ có hiệu lực cho các route /admin* (đường dẫn ở frontend)
             maxAge: expiresIn,
-            secure: true,
-            sameSite: 'strict'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
         })
 
         res.cookie("adminCsrfToken", csrfToken, {
             httpOnly: false,
             path: '/admin',
             maxAge: expiresIn,
-            secure: true,
-            sameSite: 'strict',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
         })
 
         return res.status(200).json({
@@ -221,8 +221,8 @@ export const googleLogin = async (req, res) => {
             httpOnly: true,
             path: '/',
             maxAge: expiresIn,
-            secure: process.env.NODE_ENV !== 'development',
-            sameSite: 'strict'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
         })
 
 
@@ -230,8 +230,8 @@ export const googleLogin = async (req, res) => {
             httpOnly: false,
             path: '/',
             maxAge: expiresIn,
-            secure: process.env.NODE_ENV !== 'development',
-            sameSite: 'strict'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
         })
 
         return res.status(200).json({
