@@ -35,6 +35,7 @@ class User {
         this.updatedAt = updatedAt;
     }
 
+    // sử dụng toObject sẽ bị parse hết thành json, timestamp sẽ không còn phương thức toDate()
     toObject() {
         return {
             firstName: this.firstName,
@@ -43,7 +44,7 @@ class User {
             identificationNumber: this.identificationNumber,
             uid: this.uid,
             phoneNumber: this.phoneNumber,
-            dateOfBirth: this.dateOfBirth,
+            dateOfBirth: this.dateOfBirth, 
             gender: this.gender,
             address: this.address,
             role: this.role,

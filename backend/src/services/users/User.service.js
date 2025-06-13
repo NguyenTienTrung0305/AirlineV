@@ -99,3 +99,16 @@ export const dbGetUserByEmail = async (email) => {
         throw new Error(`getting user failed: ${error.message}`)
     }
 }
+
+
+export const dbUpdateUser = async (uid, dataUser) => {
+    try {
+        const userRef = db.collection(USER_COLLECTION_NAME).doc(uid)
+        await userRef.update(dataUser)
+        return true
+    }
+    catch (error) {
+        console.log(`updating user ${uid} failed: ${error.message}`)
+        return false
+    }
+}

@@ -6,11 +6,15 @@ import createTypeSeatRouters from './seat/index.js'
 import { isAdminRoute, verifySessionAndCSRF } from '../middleware/auth.middleware.js'
 import flightsRouters from './flight/index.js'
 
+import accountRouters from './account/index.js'
+
 const initWebRoutes = (app) => {
     app.use("/admin/auth", authRouters)
     app.use("/api/login", loginRouters)
     app.use("/api/user", userRouters)
     app.use("/api/admin", adminRouters)
+
+    app.use("/api/account", accountRouters)
 
     app.use("/api/typeSeats", verifySessionAndCSRF, isAdminRoute, createTypeSeatRouters)
     app.use("/api/admin/flights", verifySessionAndCSRF, isAdminRoute, flightsRouters)

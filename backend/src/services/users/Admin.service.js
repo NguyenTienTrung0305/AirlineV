@@ -55,3 +55,14 @@ export const dbGetAllAdmins = async () => {
         throw new Error(`Error getting all admins: ${error.message}`)
     }
 }
+
+export const dbUpdateAdmin = async (uid, data) => {
+    try {
+        const adminRef = db.collection(ADMIN_COLLECTION_NAME).doc(uid)
+        await adminRef.update(data)
+        return true
+    } catch (error) {
+        console.log(`updating admin ${uid} failed: ${error.message}`)
+        return false
+    }
+}
