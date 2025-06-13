@@ -30,6 +30,7 @@ app.use(cors({
 }))
 
 app.use(cookieParser())
+app.use(express.json())
 
 // Quản lý phiên người dùng ở phía server. Nó cung cấp các cơ chế để tạo, lưu trữ và truy xuất dữ liệu phiên liên quan đến từng người dùng
 // Khi một người dùng mới truy cập ứng dụng (hoặc phiên của họ hết hạn), express-session sẽ tạo một Session ID duy nhất cho họ dựa trên secret và bộ mã hóa
@@ -42,19 +43,19 @@ app.use(cookieParser())
 app.use(session({
     secret: process.env.SECRET_KEY,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Đổi thành false để không tạo session rỗng
     cookie: {
         httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
-        sameSite: 'None',
+        secure: process.env.NODE_ENV === 'production', // Chỉ true khi production
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'lax', // Development dùng 'lax'
         path: '/',
         maxAge: 24 * 60 * 60 * 1000,
     },
-    // store 
+    name: 'connect.sid', 
+    // store: // Nên dùng Redis hoặc database store trong production
 }))
 
 
-app.use(express.json())
 
 initWebRoutes(app)
 
