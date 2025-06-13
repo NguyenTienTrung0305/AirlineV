@@ -150,6 +150,7 @@ export const AuthProvider = ({ children }) => {
     const isAdmin = user?.role === ROLES.ADMIN
 
     const isUser = user?.role === ROLES.USER
+    
 
     return (
         <AuthContext.Provider
@@ -162,6 +163,8 @@ export const AuthProvider = ({ children }) => {
                 loginUser,
                 loginAdmin,
                 logout,
+
+                checkSession
             }}
         >
             {children}

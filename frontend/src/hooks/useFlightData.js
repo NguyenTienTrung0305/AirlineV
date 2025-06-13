@@ -1,6 +1,9 @@
 import axios from "@/util/axiosCustom.js";
 import { useEffect, useCallback, useState, useRef } from 'react'
 
+
+const DEFAULT_BUDGET_RANGE = [100000, 10000000]
+
 export function formatTime(date) {
     return date.toLocaleTimeString([], {
         hour: "2-digit",
@@ -159,7 +162,7 @@ function transformFlight(data, from, to) {
                 col,
                 rowBusiness: businessSeats, // số lượng hàng ghế thương gia
                 rowNormal: normalSeats, // số lượng hàng ghế phổ thông
-                missBusiness: 0, 
+                missBusiness: 0,
                 missNormal: 0,
             })
         })
@@ -200,7 +203,14 @@ function transformFlight(data, from, to) {
 }
 
 export const useFlightData = (departureCity, arrivalCity, flightDate) => {
-    const [flights, setFlights] = useState([]);
+    const [flights, setFlights] = useState([])
+    const [returnFlights, setReturnFlights] = useState([])
+    const [filteredFlights, setFilteredFlights] = useState([])
+    const [filters, setFilters] = useState({
+        budget: DEFAULT_BUDGET_RANGE,
+        departureTime: "all"
+    })
+
     const [error, setError] = useState(null)
     const [isLoading, setIsLoading] = useState(false)
 
@@ -226,7 +236,7 @@ export const useFlightData = (departureCity, arrivalCity, flightDate) => {
 
     const fetchSuggessionFlight = useCallback(async (setState) => {
         try {
-            const response = await axios.get("/api/flights/suggesion", {timeout: 180000})
+            const response = await axios.get("/api/flights/suggesion", { timeout: 180000 })
             if (response.status === 200) {
                 const transformedData = transformFlight(response.data.data)
                 console.log(transformedData)
@@ -240,6 +250,14 @@ export const useFlightData = (departureCity, arrivalCity, flightDate) => {
             setIsLoading(false)
         }
     }, [setError])
+
+
+    // fetch return flights
+    const fetchReturnFlights = useCallback(async (from, to, date) => {
+        setIsLoading(true)
+        await fetchFlights(from, to, date, setReturnFlights)
+        setIsLoading(false)
+    }, [fetchFlights])
 
     useEffect(() => {
         const loadFlights = async () => {
@@ -258,9 +276,41 @@ export const useFlightData = (departureCity, arrivalCity, flightDate) => {
         loadFlights()
     }, [departureCity, arrivalCity, flightDate, fetchFlights, fetchSuggessionFlight])
 
+
+
+    // Bộ lọc các chuyến bay
+    const applyFilter = useCallback(() => {
+        const allFlights = [...flights, ...returnFlights]
+        return allFlights.filter((flight) => {
+            const inBudget = (parseFloat(flight.standardPrice) + parseFloat(flight.economyOptions[0].price)) >= parseFloat(filters.budget[0]) &&
+                (parseFloat(flight.standardPrice) + parseFloat(flight.economyOptions[0].price)) <= parseFloat(filters.budget[1])
+
+            const hour = flight.departureTime.getHours()
+            const inTimeRange = (filters.departureTime === 'all') ||
+                (filters.departureTime === 'morning' && hour >= 0 && hour < 12) ||
+                (filters.departureTime === 'afternoon' && hour >= 12 && hour < 18) ||
+                (filters.departureTime === 'evening' && hour >= 18 && hour < 24)
+
+            
+            return inBudget && inTimeRange
+        })
+    }, [flights, filters, returnFlights])
+    // Mỗi khi flights hoặc filters thay đổi => applyFilter được tạo lại => useEffect sẽ chạy lại => re-render và set lại filteredFlights
+    useEffect(() => {
+        setFilteredFlights(applyFilter())
+    }, [applyFilter])
+
     return {
         flights,
-        isLoading
+        setFlights,
+
+        isLoading,
+        returnFlights,
+        fetchReturnFlights,
+
+        filters,
+        setFilters,
+        filteredFlights
     }
 }
 

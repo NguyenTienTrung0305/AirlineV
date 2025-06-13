@@ -24,7 +24,7 @@ const SearchFlightForm = ({ onSearch }) => {
 
     departureDate, setDepartureDate,
     returnDate, setReturnDate,
-    
+
     tripType, setTripType,
     swapAirports,
     isValid,
@@ -37,7 +37,8 @@ const SearchFlightForm = ({ onSearch }) => {
       return
     }
 
-    // dữ liệu được mặc định đóng gói vào object data => rồi truyền qua onSearch bên FlightBookingTabs, onSeach này chính là handleSearch bên FlightBookingTabs
+    // FlightBookingTabs truyền function onSearch cho SearchFlightForm (con), không cần truyền tham số vào hàm
+    // Khi click vào nút Search, SearchFlightForm sẽ thực thi hàm onSearch của FlightBookingTabs, với tham số của SearchFlightForm
     onSearch({
       fromAirport,
       toAirport,
