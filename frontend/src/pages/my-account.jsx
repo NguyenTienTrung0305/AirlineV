@@ -1,6 +1,7 @@
 'use-client'
 
 import { AccountInfo } from "@/components/account-info/account-infomation"
+import { PasswordChange } from "@/components/account-info/password-change"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useAccountInfo } from "@/hooks/useAccountInfo"
@@ -73,11 +74,11 @@ export default function MyAccount() {
                             </h1>
                         </TabsContent>
 
+                        {/* change pasword */}
                         <TabsContent value="changepassword">
-                            <h1 className="text-center text-xl font-semibold mb-4 text-zinc-800">
-                                Thay đổi mật khẩu
-                            </h1>
-
+                            <PasswordChange 
+                                personalInfo={personalInfo}
+                            />
                         </TabsContent>
                     </Card>
                 </Tabs>
