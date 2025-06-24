@@ -14,6 +14,7 @@ export default function Login() {
     const {
         formData,
         loading,
+        loadingGg,
         handleInputChange,
         handleSubmit,
         handleGoogleLogin
@@ -63,8 +64,9 @@ export default function Login() {
                             type="submit"
                             variant="default"
                             className="w-full text-white p-2 text-xl bg-orange"
+                            disabled={loading}
                         >
-                            Đăng nhập
+                            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
                         </Button>
                     </form>
 
@@ -83,10 +85,10 @@ export default function Login() {
                             type="button"
                             className="w-full p-2 text-lg"
                             onClick={handleGoogleLogin}
-                            disabled={loading}
+                            disabled={loadingGg}
                         >
                             <FcGoogle />
-                            {loading ? "Đang đăng nhập..." : "Đăng nhập với Google"}
+                            {loadingGg ? "Đang đăng nhập..." : "Đăng nhập với Google"}
                         </Button>
                     </div>
 

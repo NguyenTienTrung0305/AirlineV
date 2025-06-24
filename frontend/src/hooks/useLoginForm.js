@@ -10,6 +10,7 @@ import firebase from "@/auth/firebase.js"
 export const useLoginForm = (onSuccess) => {
     const [formData, setFormData] = useState({ email: "", password: "" });
     const [loading, setLoading] = useState(false);
+    const [loadingGg, setLoadingGg] = useState(false);
 
     const { loginUser } = useAuth()
 
@@ -69,7 +70,7 @@ export const useLoginForm = (onSuccess) => {
 
     // login with google
     const handleGoogleLogin = async (e) => {
-        setLoading(true)
+        setLoadingGg(true)
         e.preventDefault()
 
         try {
@@ -108,13 +109,14 @@ export const useLoginForm = (onSuccess) => {
             })
         }
         finally {
-            setLoading(false)
+            setLoadingGg(false)
         }
     }
 
     return {
         formData,
         loading,
+        loadingGg,
         handleSubmit,
         handleInputChange,
         handleGoogleLogin
