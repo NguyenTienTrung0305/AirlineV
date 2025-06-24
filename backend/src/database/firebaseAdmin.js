@@ -33,7 +33,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 import { getAuth } from 'firebase-admin/auth'
 import path from 'path';
 import { fileURLToPath } from 'url'
-import fs from 'fs'; 
+import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,6 +50,7 @@ if (process.env.NODE_ENV === 'development') {
         process.exit(1)
     }
 } else {
+    // deploy, read serviceAccountJson from enviroment variable of render.com
     const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
 
     if (!serviceAccountJson) {
