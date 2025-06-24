@@ -3,6 +3,7 @@
 import { CheckInConfrm } from "@/components/check-in/check-in-confirm"
 import FlightDetailStep from "@/components/check-in/flight-detail-step"
 import { PassengerList } from "@/components/check-in/passenger-list"
+import { PaymentStep } from "@/components/check-in/payment-step"
 import { StepIndicator } from "@/components/check-in/step-indicator"
 import { formatFlightDuration } from "@/hooks/useFlightData"
 import axios from "@/util/axiosCustom"
@@ -17,6 +18,10 @@ const steps = [
     {
         title: "Hành khách",
         description: "Chọn hành khách"
+    },
+    {
+        title: "Thanh toán",
+        description: "Thanh toán vé máy bay"
     },
     {
         title: "Xác nhận",
@@ -40,8 +45,15 @@ export default function CheckIn() {
 
     const [passengersData, setPassengersData] = useState([])
 
+    const [paymentData, setPaymentData] = useState(null)
+    const [paymentStatus, setPaymentStatus] = useState("pending")
 
 
+    const calculateTotalServiceFee = () => {
+        const baseFeePerPassenger = 50000
+        const passengerCount = Array.isArray(passengers) ? passengers.length : parseInt(passengers)
+        return baseFeePerPassenger * passengerCount
+    }
 
 
     // FETCH API
@@ -103,6 +115,48 @@ export default function CheckIn() {
 
 
 
+    // handle payment
+    const handlePayment = async (paymentMethod, paymentDetails) => {
+        setPaymentStatus('processing')
+
+        try {
+            const paymentPayload = {
+                flightId,
+                passengers: passengersData,
+                amount: calculateTotalServiceFee(),
+                paymentMethod,
+                paymentDetails,
+                transactionId: `CHECKIN_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+            }
+
+            const response = await axios.post('/api/payment/process', paymentPayload)
+
+
+        } catch (error) {
+            console.error('Error processing payment:', error)
+            setPaymentStatus('failed')
+        }
+    }
+
+
+
+    // verify payment
+    const verifyPayment = async (transactionId) => {
+        try {
+            const response = await axios.get(`/api/payment/verify/${transactionId}`)
+            if (response.status === 200) {
+                setPaymentStatus('completed')
+                setPaymentData(response.data.paymentInfo)
+                return true
+            }
+            return false
+        } catch (error) {
+            console.error('Payment verification error:', error)
+            return false
+        }
+    }
+
+
 
     // Điều hướng steps
     const handleContinue = async () => {
@@ -122,6 +176,11 @@ export default function CheckIn() {
 
     const hanldeBack = async () => {
         if (currentStep > 0) {
+            // Reset payment status khi quay lại từ bước thanh toán
+            if (currentStep === 2) {
+                setPaymentStatus('pending')
+                setPaymentData(null)
+            }
             setCurrentStep((prev) => (prev - 1))
         }
     }
@@ -169,7 +228,18 @@ export default function CheckIn() {
                 />
             )}
 
-            {currentStep === 2 && (
+            {currentStep == 2 && (
+                <PaymentStep
+                    amount={calculateTotalServiceFee()}
+                    passengerCount={Array.isArray(passengers) ? passengers.length : parseInt(passengers) || 1}
+                    paymentStatus={paymentStatus}
+                    onPayment={handlePayment}
+                    onBack={hanldeBack}
+                    onVerifyPayment={verifyPayment}
+                />
+            )}
+
+            {currentStep === 3 && (
                 <CheckInConfrm
                     flight={departureFlight}
                     passengerList={passengersData}
