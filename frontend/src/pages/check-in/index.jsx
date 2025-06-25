@@ -233,6 +233,7 @@ export default function CheckIn() {
                     amount={calculateTotalServiceFee()}
                     passengerCount={Array.isArray(passengers) ? passengers.length : parseInt(passengers) || 1}
                     paymentStatus={paymentStatus}
+                    setPaymentStatus={setPaymentStatus}
                     onPayment={handlePayment}
                     onBack={hanldeBack}
                     onVerifyPayment={verifyPayment}
