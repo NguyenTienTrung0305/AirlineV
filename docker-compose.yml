@@ -1,0 +1,53 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: airline-backend:dev
+    container_name: airline_backend
+    ports:
+      - "8080:8080"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 8080
+      HOST: 0.0.0.0
+      SESSION_SECRET: ${SESSION_SECRET}
+      # firebaseAdmin.js đọc đường dẫn key từ biến này rồi readFileSync.
+      GOOGLE_APPLICATION_CREDENTIALS: /app/serviceAccountKey.json
+      CLOUD_NAME: ${CLOUD_NAME}
+      CLOUD_API_KEY: ${CLOUD_API_KEY}
+      CLOUD_API_SECRET: ${CLOUD_API_SECRET}
+    volumes:
+      - ./backend/serviceAccountKey.json:/app/serviceAccountKey.json:ro
+    restart: unless-stopped
+    networks:
+      - airline_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
+        NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+        NEXT_PUBLIC_API_KEY: ${NEXT_PUBLIC_API_KEY}
+        NEXT_PUBLIC_AUTH_DOMAIN: ${NEXT_PUBLIC_AUTH_DOMAIN}
+        NEXT_PUBLIC_PROJECT_ID: ${NEXT_PUBLIC_PROJECT_ID}
+        NEXT_PUBLIC_STORAGE_BUCKET: ${NEXT_PUBLIC_STORAGE_BUCKET}
+        NEXT_PUBLIC_MESSAGING_SENDER_ID: ${NEXT_PUBLIC_MESSAGING_SENDER_ID}
+        NEXT_PUBLIC_APP_ID: ${NEXT_PUBLIC_APP_ID}
+        NEXT_PUBLIC_MEASUREMENT_ID: ${NEXT_PUBLIC_MEASUREMENT_ID}
+    image: airline-frontend:dev
+    container_name: airline_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - airline_net
+
+networks:
+  airline_net:
+    driver: bridge
