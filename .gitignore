@@ -1,0 +1,19 @@
+.env
+.env.local
+*.local
+backend/serviceAccountKey.json
+backend/.env
+*.mcp.*
+
+# Dependencies / build output
+node_modules/
+**/node_modules/
+frontend/.next/
+frontend/out/
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db
+
+.codegraph/
