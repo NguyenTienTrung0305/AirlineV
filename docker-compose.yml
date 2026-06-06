@@ -48,6 +48,49 @@ services:
     networks:
       - airline_net
 
+  # Prometheus: scrape /metrics của backend rồi lưu thành time-series.
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: airline_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      # Nạp file cấu hình đúng chỗ Prometheus đọc
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      # Volume có tên để dữ liệu số liệu không mất khi container bị xóa/tạo lại
+      - prometheus_data:/prometheus
+    restart: unless-stopped
+    networks:
+      - airline_net
+
+  # Grafana: vẽ dashboard từ số liệu Prometheus. Map 3001:3000 (port_window:port_container) vì 3000 đã là frontend.
+  grafana:
+    image: grafana/grafana:latest
+    container_name: airline_grafana
+    ports:
+      - "3001:3000"
+    environment:
+      # Tài khoản admin mặc định cho local (đổi khi lên prod)
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      # Provisioning: Grafana đọc lúc khởi động để tự tạo datasource + nạp dashboard.
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/etc/grafana/dashboards:ro
+      # Lưu cấu hình/người dùng Grafana qua các lần restart.
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - airline_net
+
 networks:
   airline_net:
     driver: bridge
+
+# Named volumes: Docker tự quản lý vùng lưu trên ổ đĩa, tồn tại qua các lần down/up.
+volumes:
+  prometheus_data:
+  grafana_data:

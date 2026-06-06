@@ -4,6 +4,7 @@ import cors from "cors"
 import cookieParser from 'cookie-parser';
 import config from "./src/config/dotenv.config.js"
 import initWebRoutes from './src/routes/index.js'
+import { register, metricsMiddleware } from './src/config/metrics.config.js'
 
 const app = express()
 
@@ -41,7 +42,7 @@ app.use(express.json())
 // Server (thông qua express-session middleware) sẽ sử dụng Session ID được gửi trong cookie được cấu hình trong express-session để xác định phiên của người dùng và truy 
 // cập dữ liệu phiên đã được lưu trữ ở backend (req.sesison.user, req.sesison.role,...)
 app.use(session({
-    secret: process.env.SECRET_KEY,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false, // Đổi thành false để không tạo session rỗng
     cookie: {
@@ -56,6 +57,15 @@ app.use(session({
 }))
 
 
+
+// Đo thời gian mọi request — đặt TRƯỚC initWebRoutes để bao trùm tất cả route.
+app.use(metricsMiddleware)
+
+// Endpoint Prometheus scrape. Trả số liệu dạng text theo đúng content-type của register.
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', register.contentType)
+    res.end(await register.metrics())
+})
 
 initWebRoutes(app)
 
