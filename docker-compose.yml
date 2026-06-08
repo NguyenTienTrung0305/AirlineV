@@ -12,6 +12,8 @@ services:
       PORT: 8080
       HOST: 0.0.0.0
       SESSION_SECRET: ${SESSION_SECRET}
+      # Origin được phép gọi API (CORS). Local mặc định localhost:3000; trên EC2 set IP public.
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000}
       # firebaseAdmin.js đọc đường dẫn key từ biến này rồi readFileSync.
       GOOGLE_APPLICATION_CREDENTIALS: /app/serviceAccountKey.json
       CLOUD_NAME: ${CLOUD_NAME}

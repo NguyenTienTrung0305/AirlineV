@@ -4,6 +4,7 @@
 backend/serviceAccountKey.json
 backend/.env
 *.mcp.*
+docs/
 
 # Dependencies / build output
 node_modules/

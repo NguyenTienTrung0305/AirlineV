@@ -13,7 +13,7 @@ on:
     branches: [master]
 
 jobs:
-  # ---- Job 1: kiểm tra lint frontend (hiện chưa chặn vì ESLint config đang lỗi) ----
+  # ---- Job 1: run lint frontend ----
   lint-frontend:
     runs-on: ubuntu-latest
     defaults:
