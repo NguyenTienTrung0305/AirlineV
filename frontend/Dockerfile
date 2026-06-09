@@ -38,7 +38,11 @@ FROM node:22-alpine AS production
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1
 
-# output: 'standalone' => khi build, Next.js sẽ tạo ra một bản build gọn trong thư mục standalone, chứa server.js + node_modules cần thiết để chạy production
+# Standalone không tự gồm thư mục public và .next/static => phải copy tay cả 2,
+# nếu không sẽ thiếu ảnh tĩnh (bg-*.jpg) và ảnh tối ưu qua /_next/image (lỗi 400/404).
+COPY --from=builder --chown=node:node /app/public ./public
+
+# output: 'standalone' => Next.js tạo bản build gọn (server.js + node_modules cần thiết).
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 
