@@ -21,9 +21,29 @@ const aircraftData = [
     { name: 'Boeing 777', value: 2 }
 ]
 
+// const testData = [
+//     {
+//         "category": "Column 1",
+//         "ValueA": 10,
+//         "ValueB": 7,
+//         "ValueC": 13,
+//     },
+//     {
+//         "category": "Column 2",
+//         "ValueA": 5,
+//         "ValueB": 4,
+//         "ValueC": 6,
+//         "ValueD": 19
+//     },
+// ]
+
+
 const COLORS = ['#3b82f6', '#ef4444', '#84cc16', '#06b6d4']
 
 export default function Dashboard() {
+
+    // const listKey = new Set(testData.flatMap(item => Object.keys(item).filter(key => key !== 'category')))
+
     const router = useRouter()
     const { isAdmin, isAuthenticated, loading } = useAuth()
     const [data, setData] = useState({
@@ -37,6 +57,7 @@ export default function Dashboard() {
         if (!loading && (!isAuthenticated || !isAdmin)) {
             router.push('/admin')
         }
+
 
     }, [router, isAuthenticated, isAdmin, loading])
 
@@ -154,6 +175,23 @@ export default function Dashboard() {
                     </div>
                 </CardContent>
             </Card>
-        </div>
+            {/* <div>
+                <BarChart data={testData} width={500} height={300}>
+                    <XAxis dataKey="category" />
+                    <YAxis />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <Tooltip />
+                    <Legend />
+                    {Array.from(listKey).map((key, index) => (
+                        <Bar
+                            key={index}
+                            dataKey={key}
+                            stackId="x"
+                            fill={COLORS[index % COLORS.length]}
+                        />
+                    ))}
+                </BarChart>
+            </div> */}
+        </div >
     )
 }

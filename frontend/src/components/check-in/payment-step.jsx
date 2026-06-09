@@ -3,16 +3,19 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio";
 import Image from "next/image";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { ArrowRight, Building2, ChevronRight, Loader2 } from "lucide-react";
+import { ArrowRight, Building2, CheckCircle, ChevronRight, Loader2 } from "lucide-react";
 import unidecode from "unidecode";
 
 export function PaymentStep({
+    user,
+    flightId,
     amount,
     passengerCount,
     paymentStatus,
     setPaymentStatus,
     onPayment,
     onBack,
+    onContinue,
     onVerifyPayment
 }) {
     const [timeLeft, setTimeLeft] = useState(900)
@@ -46,7 +49,7 @@ export function PaymentStep({
                 accountNumber: '1030014478',
                 accountName: 'NGUYEN TIEN TRUNG',
                 amount: amount,
-                description: `CHECKIN_${Date.now()}`
+                description: `USER_${user?.uid}_CHECKIN_${flightId}`
             }
             setPaymentDetails(bankInfo)
 
@@ -55,6 +58,18 @@ export function PaymentStep({
             setQrCode(qrData)
         }
     }, [paymentType, amount])
+
+
+    // redirect if payment is completed
+    useEffect(() => {
+        if (paymentStatus === 'completed') {
+            const redirectTimer = setTimeout(() => {
+                onContinue()
+            }, 2000)
+            return () => clearTimeout(redirectTimer)
+        }
+    }, [paymentStatus, onContinue])
+
 
     function removeDiacritics(str) {
         return unidecode(str)
@@ -84,6 +99,27 @@ export function PaymentStep({
         }
 
         await onPayment(paymentType, payload) // execute handlePayment and setPaymentStatus("processing") 
+    }
+
+
+
+    if (paymentStatus === 'completed') {
+        return (
+            <div className="max-w-2xl mx-auto mt-8">
+                <div className="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
+                    <CheckCircle className="mx-auto h-16 w-16 text-green-500 mb-4" />
+                    <h2 className="text-2xl font-bold text-green-800 mb-2">
+                        Thanh toán thành công!
+                    </h2>
+                    <p className="text-green-600 mb-4">
+                        Giao dịch của bạn đã được xử lý thành công
+                    </p>
+                    <div className="text-sm text-gray-600">
+                        Đang chuyển đến bước xác nhận...
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -139,18 +175,21 @@ export function PaymentStep({
                             </div>
                         )}
 
-                        <button
-                            onClick={() => onVerifyPayment(paymentDetails.description)}
-                            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 mr-4"
-                        >
-                            Tôi đã chuyển khoản
-                        </button>
-                        <button
-                            onClick={() => setPaymentStatus("pending")}
-                            className="px-6 py-2 bg-zinc-600 text-white rounded-lg hover:bg-zinc-700"
-                        >
-                            Hủy giao dịch
-                        </button>
+                        <div className="max-sm:space-y-3 max-sm:text-start max-sm:pl-4 max-sm:text-sm">
+                            <button
+                                onClick={() => onVerifyPayment(paymentDetails.description)}
+                                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 mr-4"
+                            >
+                                Tôi đã chuyển khoản
+                            </button>
+                            <button
+                                onClick={() => setPaymentStatus("pending")}
+                                className="px-6 py-2 bg-zinc-600 text-white rounded-lg hover:bg-zinc-700"
+                            >
+                                Hủy giao dịch
+                            </button>
+                        </div>
+
                     </div>
                 ) : (
                     // Fee

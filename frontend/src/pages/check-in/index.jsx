@@ -1,5 +1,6 @@
 "use-client"
 
+import { useAuth } from "@/auth/auth"
 import { CheckInConfrm } from "@/components/check-in/check-in-confirm"
 import FlightDetailStep from "@/components/check-in/flight-detail-step"
 import { PassengerList } from "@/components/check-in/passenger-list"
@@ -38,6 +39,9 @@ export default function CheckIn() {
         seats,
         passengers
     } = router.query
+
+
+    const { user } = useAuth()
 
     const [currentStep, setCurrentStep] = useState(0)
     const [departureFlight, setDepartureFlight] = useState(null)
@@ -121,16 +125,26 @@ export default function CheckIn() {
 
         try {
             const paymentPayload = {
+                userUid: user?.uid,
                 flightId,
                 passengers: passengersData,
                 amount: calculateTotalServiceFee(),
                 paymentMethod,
                 paymentDetails,
-                transactionId: `CHECKIN_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+                transactionId: `USER_${user?.uid}_CHECKIN_${flightId}`
             }
 
             const response = await axios.post('/api/payment/process', paymentPayload)
+            if (response.data.code === "BANK_TRANSFER_SUCCESS") {
 
+                // Verify payment after processing
+                const isVerified = await verifyPayment(paymentPayload.transactionId)
+                if (isVerified) {
+                    setCurrentStep(3) // Move to confirmation step
+                } else {
+                    setPaymentStatus('failed')
+                }
+            }
 
         } catch (error) {
             console.error('Error processing payment:', error)
@@ -230,12 +244,15 @@ export default function CheckIn() {
 
             {currentStep == 2 && (
                 <PaymentStep
+                    userId={user?.uid}
+                    flightId={flightId}
                     amount={calculateTotalServiceFee()}
                     passengerCount={Array.isArray(passengers) ? passengers.length : parseInt(passengers) || 1}
                     paymentStatus={paymentStatus}
                     setPaymentStatus={setPaymentStatus}
                     onPayment={handlePayment}
                     onBack={hanldeBack}
+                    onContinue={handleContinue}
                     onVerifyPayment={verifyPayment}
                 />
             )}

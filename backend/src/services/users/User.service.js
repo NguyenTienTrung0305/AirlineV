@@ -112,3 +112,22 @@ export const dbUpdateUser = async (uid, dataUser) => {
         return false
     }
 }
+
+export const dbGetTransactionHistory = async (uid) => {
+    try {
+        const userRef = db.collection(USER_COLLECTION_NAME).doc(uid)
+        await userRef.get().then((doc) => {
+            if (doc.exists) {
+                const userData = doc.data()
+                return userData.transactionHistory || []
+            }
+            return []
+        })
+    } catch (error) {
+        console.log(`getting transaction history failed: ${error.message}`)
+        return []
+    }
+}
+
+
+

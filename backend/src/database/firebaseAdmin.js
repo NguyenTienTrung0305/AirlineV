@@ -34,37 +34,42 @@ import { getAuth } from 'firebase-admin/auth'
 import path from 'path';
 import { fileURLToPath } from 'url'
 import fs from 'fs';
+import { json } from 'stream/consumers';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let serviceAccount
 
-if (process.env.NODE_ENV === 'development') {
+// docker local
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS && fs.existsSync(process.env.GOOGLE_APPLICATION_CREDENTIALS)) {
     try {
-        const serviceAccountPath = path.resolve(__dirname, '../../serviceAccountKey.json')
-        const fileContent = fs.readFileSync(serviceAccountPath, 'utf8')
-        serviceAccount = JSON.parse(fileContent)
+        const file = fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS, 'utf8')
+        serviceAccount = JSON.parse(file)
     } catch (error) {
-        console.error('Lỗi: Không tìm thấy serviceAccountKey.json hoặc lỗi đọc/phân tích cú pháp trong môi trường phát triển cục bộ:', error)
         process.exit(1)
     }
-} else {
-    // deploy, read serviceAccountJson from enviroment variable of render.com
-    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_KEY
+}
 
-    if (!serviceAccountJson) {
-        process.exit(1);
+// deploy, read serviceAccountJson from enviroment variable of render.com
+else if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    try {
+        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY)
+    } catch (error) {
+        process.exit(1)
     }
 
+// local development
+} else {
     try {
-        serviceAccount = JSON.parse(serviceAccountJson);
-        console.log('Firebase Admin SDK đã được khởi tạo từ biến môi trường (production).')
+        const fallbackPath = path.join(__dirname, '../../serviceAccountKey.json')
+        const file = fs.readFileSync(fallbackPath, 'utf8')
+        serviceAccount = JSON.parse(file)
     } catch (error) {
-        console.error('Lỗi phân tích cú pháp JSON từ biến môi trường:', error);
-        process.exit(1);
+        process.exit(1)
     }
 }
+
 
 const app = !getApps().length ? initializeApp({
     credential: cert(serviceAccount)

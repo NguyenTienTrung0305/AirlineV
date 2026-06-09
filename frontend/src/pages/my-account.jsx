@@ -1,6 +1,7 @@
 'use-client'
 
 import { AccountInfo } from "@/components/account-info/account-infomation"
+import { BookingHistory } from "@/components/account-info/history-booking"
 import { PasswordChange } from "@/components/account-info/password-change"
 import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -69,9 +70,7 @@ export default function MyAccount() {
                         </TabsContent>
 
                         <TabsContent value="history">
-                            <h1 className="text-center text-xl font-semibold mb-4 text-zinc-800">
-                                History
-                            </h1>
+                            <BookingHistory />
                         </TabsContent>
 
                         {/* change pasword */}
