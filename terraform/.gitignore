@@ -1,0 +1,11 @@
+# .terraform/ = thư mục provider tải về (rất nặng)
+.terraform/
+.terraform.lock.hcl
+
+# *.tfstate = sổ ghi nhớ trạng thái hạ tầng — Có thể chứa thông tin nhạy cảm
+*.tfstate
+*.tfstate.*
+
+# file biến (có thể chứa secret)
+*.tfvars
+*.txt
