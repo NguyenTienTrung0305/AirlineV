@@ -13,3 +13,16 @@ output "web_url" {
   description = "URL web sau khi deploy"
   value       = "http://${aws_eip.web.public_ip}:3000"
 }
+
+
+output "ecr_repo_urls" {
+  description = "URL các ECR repo (frontend/backend)"
+  value = {
+    for name, repo in aws_ecr_repository.app : name => repo.repository_url
+  }
+}
+
+output "github_actions_role_arn" {
+  description = "ARN role cho GitHub Actions assume qua OIDC"
+  value       = aws_iam_role.github.arn
+}
