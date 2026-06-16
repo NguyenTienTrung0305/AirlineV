@@ -30,7 +30,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        # compose tự đọc file .env cùng thư mục rồi truyền vào build-args
+        # compose tự đọc file .env cùng thư mục rồi truyền vào build-args, bên Dockerfile dùng ARG để nhận rồi dùng ENV để set biến môi trường trong container.
         NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
         NEXT_PUBLIC_API_KEY: ${NEXT_PUBLIC_API_KEY}

@@ -6,9 +6,12 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-# Biến NEXT_PUBLIC_* của Next.js được nhúng vào bundle tại thời điểm build, không phải lúc container chạy.
-# Vì vậy cần truyền qua ARG từ docker build / docker compose build.args, rồi gán thành ENV trước khi chạy "next build".
-# Khi đó giá trị mới được đóng vào file JS gửi cho trình duyệt.
+# Biến NEXT_PUBLIC_* phải được nhúng vào bundle lúc BUILD, không phải lúc container chạy.
+#  + Vì code này chạy trên TRÌNH DUYỆT (không có process.env như Node). Lúc build, Next.js
+#    THAY THẲNG process.env.NEXT_PUBLIC_* bằng giá trị chuỗi cố định, in cứng vào file JS.
+#  + Nên lúc run không đổi được nữa (file JS đã đông cứng) => phải có giá trị từ lúc build.
+# Dùng ARG để NHẬN build-args (giá trị compose hoặc CI/CD gửi vào qua build-args), rồi ENV để next build (Node) đọc được
+# qua process.env và in vào bundle.
 ARG NEXT_PUBLIC_API_BASE_URL
 ARG NEXT_PUBLIC_APP_URL
 ARG NEXT_PUBLIC_API_KEY

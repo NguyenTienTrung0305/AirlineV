@@ -1,0 +1,62 @@
+name: CD
+
+on:
+  push:
+    branches: [master]
+
+permissions:
+  id-token: write # cho phép workflow xin OIDC token (để đổi lấy creds AWS)
+  contents: read # cho phép workflow đọc code repo
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code # lấy code về máy ảo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials # Đổi OIDC token -> creds AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::540175642864:role/airlinev-github-role # workflow nói với aws rằng muốn đóng vai role này
+          aws-region: ap-southeast-1
+
+      - name: Login to ECR # Đăng nhập vào ECR
+        id: login-ecr # # đặt id để step sau lấy registry URL
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true # build xong thì đẩy image lên ECR luôn
+          # tag dạng: địa_chỉ_kho/tên_kho:tên_tag
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/airlinev-backend:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/airlinev-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          push: true
+          tags: |
+            ${{ steps.login-ecr.outputs.registry }}/airlinev-frontend:${{ github.sha }}
+            ${{ steps.login-ecr.outputs.registry }}/airlinev-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=${{ vars.NEXT_PUBLIC_API_BASE_URL }}
+            NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
+            NEXT_PUBLIC_API_KEY=${{ vars.NEXT_PUBLIC_API_KEY }}
+            NEXT_PUBLIC_AUTH_DOMAIN=${{ vars.NEXT_PUBLIC_AUTH_DOMAIN }}
+            NEXT_PUBLIC_PROJECT_ID=${{ vars.NEXT_PUBLIC_PROJECT_ID }}
+            NEXT_PUBLIC_STORAGE_BUCKET=${{ vars.NEXT_PUBLIC_STORAGE_BUCKET }}
+            NEXT_PUBLIC_MESSAGING_SENDER_ID=${{ vars.NEXT_PUBLIC_MESSAGING_SENDER_ID }}
+            NEXT_PUBLIC_APP_ID=${{ vars.NEXT_PUBLIC_APP_ID }}
+            NEXT_PUBLIC_MEASUREMENT_ID=${{ vars.NEXT_PUBLIC_MEASUREMENT_ID }}

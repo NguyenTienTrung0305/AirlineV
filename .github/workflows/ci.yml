@@ -4,6 +4,9 @@ name: CI
 # Step	          -     1 lệnh/hành động trong job
 # Runner	        -     máy ảo GitHub cấp miễn phí (vd ubuntu-latest) để chạy job
 # Trigger (on:)	  -     sự kiện kích hoạt (push, pull_request)
+# uses: actions/  -     action: một đoạn code đóng gói sẵn của người khác viết
+# with:           -     with: truyền tham số cho action
+# id: step_id      -     đặt id cho step để step khác tham chiếu đến (vd lấy output)
 
 # Trigger: chạy khi push lên master, hoặc khi mở/cập nhật Pull Request vào master.
 on:
@@ -15,13 +18,13 @@ on:
 jobs:
   # ---- Job 1: run lint frontend ----
   lint-frontend:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # máy ảo github cấp để workflow chạy
     defaults:
       run:
         working-directory: ./frontend
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Workflow chạy trên một máy ảo trống trơn do GitHub cấp mới mỗi lần, máy này không có sẵn code => checkout chính là tải code về máy ảo
 
       # setup-node cài Node 22 + bật cache npm để các lần sau cài nhanh hơn.
       - name: Setup Node.js
