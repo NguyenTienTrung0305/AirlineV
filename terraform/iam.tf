@@ -32,27 +32,37 @@ resource "aws_iam_role" "github" {
 # 3. aws_iam_role_policy — Cho IAM role được phép làm gì với Resource nào (permissions policy)
 resource "aws_iam_role_policy" "github" {
     name = "airlinev-github-policy"
-    role = aws_iam_role.github.id
+    role = aws_iam_role.github.name
     policy = jsonencode({
         Version = "2012-10-17"
         Statement = [
-        {
-            Effect   = "Allow"
-            Action   = "ecr:GetAuthorizationToken"   # lệnh login, buộc phải *
-            Resource = "*"
-        },
-        {
-            Effect = "Allow"
-            Action = [
-            "ecr:BatchCheckLayerAvailability",
-            "ecr:CompleteLayerUpload",
-            "ecr:GetDownloadUrlForLayer",
-            "ecr:InitiateLayerUpload",
-            "ecr:PutImage",
-            "ecr:UploadLayerPart"
-            ]
-            Resource = [for r in aws_ecr_repository.app : r.arn]   # Chỉ 2 kho của mình
-        }
+            {
+                Effect   = "Allow"
+                Action   = "ecr:GetAuthorizationToken"   # lệnh login, buộc phải *
+                Resource = "*"
+            },
+            {
+                Effect = "Allow"
+                Action = [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:CompleteLayerUpload",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:InitiateLayerUpload",
+                "ecr:PutImage",
+                "ecr:UploadLayerPart",
+                "ecr:BatchGetImage"
+                ]
+                Resource = [for r in aws_ecr_repository.app : r.arn]   # Chỉ 2 kho của mình
+            },
+            {
+                Effect = "Allow"
+                Action = [
+                    "ssm:SendCommand", # gửi lệnh
+                    "ssm:GetCommandInvocation", # đọc kết quả/exit code lệnh
+                    "ssm:ListCommandInvocations"
+                ]
+                Resource = "*"
+            }
         ]
     })
 }

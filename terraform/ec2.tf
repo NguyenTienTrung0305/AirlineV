@@ -15,6 +15,7 @@ resource "aws_instance" "web" {
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.web.id]
   key_name               = "airlinev-key" # tái dùng key pair đã tạo tay (vẫn còn trong account)
+  iam_instance_profile   = aws_iam_instance_profile.ssm.name # Gắn instance profile để EC2 nhận role SSM (đăng ký + nhận lệnh từ SSM)
 
   # Ổ cứng 20GB gp3 
   root_block_device {
