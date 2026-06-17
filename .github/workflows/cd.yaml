@@ -60,3 +60,23 @@ jobs:
             NEXT_PUBLIC_MESSAGING_SENDER_ID=${{ vars.NEXT_PUBLIC_MESSAGING_SENDER_ID }}
             NEXT_PUBLIC_APP_ID=${{ vars.NEXT_PUBLIC_APP_ID }}
             NEXT_PUBLIC_MEASUREMENT_ID=${{ vars.NEXT_PUBLIC_MEASUREMENT_ID }}
+
+      - name: Deploy to EC2 via SSM
+        run: |
+          command_id=$(aws ssm send-command \
+            --region ap-southeast-1 \
+            --targets "Key=tag:Name,Values=airlinev-ec2" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy ${{ github.sha }}" \
+            --parameters '{"commands":[
+              "set -e",
+              "cd /home/ec2-user/AirlineV",
+              "git config --global --add safe.directory /home/ec2-user/AirlineV",
+              "git pull origin master", 
+              "aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin ${{ steps.login-ecr.outputs.registry }}",
+              "docker compose -f docker-compose.prod.yaml pull",
+              "docker compose -f docker-compose.prod.yaml up -d"
+            ]}' \
+            --query "Command.CommandId" --output text
+          )
+          echo "Command ID: $command_id"

@@ -1,0 +1,36 @@
+services:
+  backend:
+    image: ${ECR_REGISTRY}/airlinev-backend:latest # Kéo từ ECR, không cần build
+    container_name: airline_backend
+    ports:
+      - "8080:8080"
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      HOST: 0.0.0.0
+      SESSION_SECRET: ${SESSION_SECRET}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+      GOOGLE_APPLICATION_CREDENTIALS: /app/serviceAccountKey.json
+      CLOUD_NAME: ${CLOUD_NAME}
+      CLOUD_API_KEY: ${CLOUD_API_KEY}
+      CLOUD_API_SECRET: ${CLOUD_API_SECRET}
+    volumes:
+      - ./backend/serviceAccountKey.json:/app/serviceAccountKey.json:ro
+    restart: unless-stopped
+    networks:
+      - airline_net
+
+  frontend:
+    image: ${ECR_REGISTRY}/airlinev-frontend:latest
+    container_name: airline_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - airline_net
+
+networks:
+  airline_net:
+    driver: bridge
