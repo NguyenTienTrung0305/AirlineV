@@ -69,6 +69,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "Deploy ${{ github.sha }}" \
             --parameters '{"commands":[
+              "export HOME=/root",
               "set -e",
               "cd /home/ec2-user/AirlineV",
               "git config --global --add safe.directory /home/ec2-user/AirlineV",
