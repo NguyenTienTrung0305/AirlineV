@@ -65,7 +65,7 @@ jobs:
         run: |
           command_id=$(aws ssm send-command \
             --region ap-southeast-1 \
-            --targets "Key=tag:Name,Values=airlinev-ec2" \
+            --targets "Key=tag:Name,Values=airlinev-tf-ec2" \
             --document-name "AWS-RunShellScript" \
             --comment "Deploy ${{ github.sha }}" \
             --parameters '{"commands":[
