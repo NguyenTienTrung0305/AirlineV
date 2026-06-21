@@ -38,12 +38,26 @@ services:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      # nginx cần đọc cert + phục vụ challenge
+      - certbot_certs:/etc/letsencrypt:ro # đọc cert
+      - certbot_www:/var/www/certbot:ro
     depends_on:
       - frontend
       - backend
     restart: unless-stopped
     networks:
       - airline_net
+
+  certbot:
+    image: certbot/certbot
+    container_name: airline_certbot
+    volumes:
+      - certbot_certs:/etc/letsencrypt # nơi lưu cert
+      - certbot_www:/var/www/certbot # nơi ghi file challenge
 networks:
   airline_net:
     driver: bridge
+
+volumes:
+  certbot_certs:
+  certbot_www:
