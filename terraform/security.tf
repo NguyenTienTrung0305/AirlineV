@@ -25,11 +25,21 @@ resource "aws_security_group" "web" {
     cidr_blocks = [local.my_ip_cidr]
   }
 
-  # HTTP (80): nginx/HTTPS
+  # HTTP (80)
   ingress {
     description = "HTTP"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  # HTTPS (443): nginx phục vụ TLS
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
