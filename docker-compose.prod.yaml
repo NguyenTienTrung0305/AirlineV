@@ -48,6 +48,7 @@ services:
     restart: unless-stopped
     networks:
       - airline_net
+    command: '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon off;"'''
 
   certbot:
     image: certbot/certbot
@@ -55,6 +56,7 @@ services:
     volumes:
       - certbot_certs:/etc/letsencrypt # nơi lưu cert
       - certbot_www:/var/www/certbot # nơi ghi file challenge
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 networks:
   airline_net:
     driver: bridge
